@@ -1,2 +1,6 @@
+const GOOGLE_TTS_KEY = 'AIzaSyDBSkfGC8H34wibOrm9U6H1A4TSLnqVJ2g'
+const OPENAI_API_KEY = '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'
+
+export { GOOGLE_TTS_KEY, OPENAI_API_KEY }
 
 // api keys here
