@@ -11,7 +11,8 @@ function App() {
 
   const keyword = 'bro'
 
-  const contentAdd = '\n Keep the response short and simple.'
+  // const contentAdd = '\n Keep the response short and simple.'
+  const contentAdd = '\n Keep the response length short and but keep content integrity.'
   let chatHistory = [
     {
       role: 'system',
@@ -156,6 +157,7 @@ function App() {
 
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
+        // console.log(transcript)
 
         if (transcript.toLowerCase().includes(keyword.toLowerCase())){
           
