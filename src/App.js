@@ -1,9 +1,12 @@
 import './App.css';
 import { useState } from 'react';
 
-import { GOOGLE_TTS_KEY, OPENAI_API_KEY } from './API_KEYS.js'
+// import { GOOGLE_TTS_KEY, OPENAI_API_KEY } from './API_KEYS.js'
 
+const GOOGLE_TTS_KEY = process.env.REACT_APP_GOOGLE_TTS_KEY
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY
 
+console.log(GOOGLE_TTS_KEY, OPENAI_API_KEY)
 
 function App() {
   const [speech, setSpeech] = useState('Text Goes Here...')
