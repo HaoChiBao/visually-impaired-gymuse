@@ -1,118 +1,34 @@
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-// import { GOOGLE_TTS_KEY, OPENAI_API_KEY } from './API_KEYS.js'
+import generateResponse from './functions/generateResponse'
+import generateSpeech from './functions/generateSpeech'
 
-const GOOGLE_TTS_KEY = process.env.REACT_APP_GOOGLE_TTS_KEY
-const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY
+import System from './auth/system'
 
-console.log(GOOGLE_TTS_KEY, OPENAI_API_KEY)
+const system = new System()
+
+// system.signIn('test123@gmail.com', 'test123')
 
 function App() {
   const [speech, setSpeech] = useState('Text Goes Here...')
-  let speechOn = false
-
-  const keyword = 'bro'
-
-  // const contentAdd = '\n Keep the response short and simple.'
-  const contentAdd = '\n Keep the response length short and but keep content integrity.'
-  let chatHistory = [
-    {
-      role: 'system',
-      // content: 'You are a personal workout assistant. You are helping a user with their workout routine. You give unique and personalized advice to the user based on their needs and goals. You are also able to answer any questions the user may have about their workout routine.'
-      content: 'You are a personal workout assistant'
-    },
-  ]
   
   const main = async () => {
-
-    let audio = new Audio();
-
-    const generateSpeech = async (text) => {
-      return new Promise(async (resolve, reject) => {
-        
-        audio.pause();
-        // const apiUrl = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${projectId}`;
-        const apiUrl = `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${GOOGLE_TTS_KEY}`;
-        
-        const requestBody = JSON.stringify({
-          input: { text: text },
+    const top_element = document.querySelector('.top')
     
-          voice: { 
-            languageCode: 'en-US', 
-            name: "en-US-Studio-O"
-          },
-    
-          audioConfig: { 
-            audioEncoding: 'LINEAR16', 
-            // effectsProfileId: ['small-bluetooth-speaker-class-device'],
-            pitch: 0,
-            speakingRate: 1
-          },
-        });
-      
-        try {
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: requestBody,
-          });
-      
-          if (!response.ok) {
-            throw new Error(`Failed to generate speech. Status: ${response.status}`);
-          }
-      
-          const data = await response.json();
-          const audioContent = data.audioContent;
-          
-          // Handle the audio content as needed (e.g., play it, save it to a file, etc.)
-          // console.log('Speech generated:', audioContent);
+    let speechOn = false
   
-          audio.src = `data:audio/wav;base64,${audioContent}`;
-          await audio.play();
-
-          audio.onended = () => {
-            resolve()
-          }
+    const keyword = 'bro'
   
-        } catch (err) {
-          console.error('Error generating speech:', err.message || err);
-          resolve()
-        }
-
-      })
-    }
-
-    const generateResponse = async (text) => {
-      const copyChatHistory = [...chatHistory]
-      copyChatHistory.push({role: 'user', content: text + contentAdd})
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${OPENAI_API_KEY}`,
-
-          },
-          body: JSON.stringify({
-              model: 'gpt-4',
-              messages: copyChatHistory,
-              max_tokens: 100,
-              temperature: 0.2,
-              // stop: ['\n', 'User:', 'Assistant:'],
-          })
-      })
-      if (!response.ok) {
-        throw new Error(`Failed to generate response. Status: ${response.status}`);
-      }
-      const data = await response.json();
-      const content = data.choices[0].message.content
-      copyChatHistory.push({role: 'system', content})
-      chatHistory = copyChatHistory
-      return content
-    }
+    // const contentAdd = '\n Keep the response short and simple.'
+    const contentAdd = '\n Keep the response length short and but keep content integrity.'
+    let chatHistory = [
+      {
+        role: 'system',
+        // content: 'You are a personal workout assistant. You are helping a user with their workout routine. You give unique and personalized advice to the user based on their needs and goals. You are also able to answer any questions the user may have about their workout routine.'
+        content: 'You are a personal workout assistant'
+      },
+    ]
 
     // console.log(await generateResponse())
     
@@ -125,8 +41,7 @@ function App() {
 
     const turnRecognitionOn = async (color = 'lightgreen') => {
       try {
-        const body = document.querySelector('body')
-        body.style.backgroundColor = color
+        top_element.style.backgroundColor = color
         await recognition.start()
         setSpeech('Listening...')
         speechOn = true
@@ -137,8 +52,7 @@ function App() {
     
     const turnRecognitionOff = async (color = 'lavender') => {
       try {
-        const body = document.querySelector('body')
-        body.style.backgroundColor = color
+        top_element.style.backgroundColor = color
         // await recognition.stop()
         await recognition.abort()
         setSpeech('Not Listening...')
@@ -148,11 +62,12 @@ function App() {
       }
     }
 
-    window.addEventListener('click', async () => {
+    top_element.addEventListener('click', async (e) => {
+      e.preventDefault()
       if (!speechOn) await turnRecognitionOn()
       else await turnRecognitionOff()
     })
-    
+
     let timeout = null
     recognition.onresult = function (event) {
       const result = event.results[event.results.length - 1];
@@ -160,17 +75,23 @@ function App() {
 
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
-        // console.log(transcript)
+        console.log(transcript)
 
         if (transcript.toLowerCase().includes(keyword.toLowerCase())){
           
           await turnRecognitionOff('#ff7f7f')
           
-          const response = await generateResponse(transcript)
+          // add user input to chat history
+          chatHistory.push({role: 'user', content: transcript + contentAdd})
+          const [response, copyChatHistory] = await generateResponse(chatHistory)
+          
+          // update chat history with response
+          chatHistory = copyChatHistory
           console.log(chatHistory)
 
           setSpeech(chatHistory[chatHistory.length - 1].content)
 
+          // read out the response
           await generateSpeech(response)
 
           await turnRecognitionOn()
@@ -184,21 +105,25 @@ function App() {
     }
   
     recognition.onend = async function (event) {        
-      console.log('Speech recognition has stopped...')
+      // console.log('Speech recognition has stopped...')
     }
   }
 
-  window.onload = async () => {
-    await main()
-  }
+  useEffect(() => {
+    main()
+  },[])
 
   return (
-    <>
-      <h2>
-        {speech}
-      </h2>
-      {/* <button>press</button> */}
-    </>
+    <div className = 'App'>
+      <div className="top">
+        <h2>
+          {speech}
+        </h2>
+      </div>
+      <div className="bottom">
+
+      </div>
+    </div>
   );
 }
 

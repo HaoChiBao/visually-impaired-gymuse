@@ -1,3 +1,37 @@
 h2 {
   max-width: 70vw;
 }
+
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 100vh;
+  width: 100vw;
+  
+}
+
+.top{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+  height:50%;
+  width: 100%;
+  
+  background-color: lavender;
+  cursor: pointer;
+}
+
+.bottom{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+  height:50%;
+  width: 100%;
+}
