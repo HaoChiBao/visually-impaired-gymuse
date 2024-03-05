@@ -4,7 +4,7 @@
 // import { getDatabase, ref, set, get, onDisconnect } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 
 import {initializeApp} from 'firebase/app';
-import {getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword} from 'firebase/auth';
+import {getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, getUserByEmail} from 'firebase/auth';
 import {getDatabase, ref, set, get, onDisconnect} from 'firebase/database';
 
 // creates random ids
@@ -35,139 +35,23 @@ class System {
         this.user = null;
         this.uid = null;
 
-        // room details of current room the user is connected to
-        this.roomRef = null;
-        this.room = null;
-        this.rid = null;
+        this.data = {
+            username: 'Username',
+            id: nanoid(),
+            details: {
+                weight: 0,
+                height: 0,
+                age: 0,
+            },
+            goals: {
+
+            }
+        }
 
         onAuthStateChanged(this.auth, (user) => {
             this.onAuthStateChanged(user);
         })
     }
-
-    async createRoom(name){
-        const rid = nanoid(8);
-        console.log(`creating room: ${rid}`)
-
-        /* 
-         * room id
-         * room name || default to 'New Room'
-         * room users --> json of users in room where keys are UIDs and values are true
-         * room messages --> array of messages
-        */
-        const room = {
-            id: rid,
-            name: name || 'New Room',
-            users: {[this.uid]: true, '0':0},
-            messages: ['Welcome to the room!'],
-        }
-        
-        // create room
-        this.roomRef = ref(this.db, `rooms/${rid}`);
-        await this.setData(this.roomRef, room);
-
-        // leave room if the user is already in a room
-        await this.leaveRoom();
-        
-        // join room
-        await this.joinRoom(rid);
-    }
-
-    async joinRoom(rid){
-        // check if rid isn't empty
-        if(rid === "") {console.log('no room entry'); return}
-        
-        // check if rid is valid
-        this.roomRef = ref(this.db, `rooms/${rid}`);
-        await get(this.roomRef).then((snapshot) => {
-
-            console.log(`joining room: ${rid}`)
-
-            if (snapshot.exists()) {
-                this.rid = rid;
-                this.room = snapshot.val();
-
-                // add user to room
-                if(!this.room.users[this.uid]){
-                    console.log('adding user to room')
-                    this.room.users[this.uid] = true;
-                    this.setData(this.roomRef, this.room);
-                }
-                
-                // add room id to user data
-                get(this.userRef).then((snapshot) => {
-                    if (snapshot.exists()) {
-                        const user = snapshot.val();
-                        user.room = rid;
-                        this.setData(this.userRef, user);
-                    } else {
-                        console.log("No data available");
-                    }
-                })
-            } else {
-                console.log("No data available");
-            }
-        })
-    }
-
-    async leaveRoom(){
-        // remove user from room
-        await get(this.userRef).then((snapshot) => {
-            if (snapshot.exists()) {
-                // remove room id from user data
-                const user = snapshot.val();
-                
-                if(user.room != ''){
-                    const roomRef = ref(this.db, `rooms/${user.room}`);
-    
-                    // get rid from user data and remove user from room json
-                    get(roomRef).then((snapshot) => {
-                        if (snapshot.exists()) {
-                            this.room = snapshot.val();
-                            if(this.room.users[this.uid]){
-    
-                                // remove room id from user data
-                                console.log(`user leaving room: ${this.room.id}`)
-                                delete this.room.users[this.uid];
-                                // set user room location to empty
-                                user.room = '';
-    
-                                // update room and user data
-                                this.setData(this.userRef, user);
-
-                                // check if room is empty and delete if so
-                                // otherwise update room data
-                                if(Object.keys(this.room.users).length === 1){
-
-                                    // delete room
-                                    console.log(`deleting room: ${this.room.id}`)
-                                    this.deleteRoom(roomRef);
-
-                                } else {
-                                    // update room
-                                    this.setData(roomRef, this.room);
-                                }
-                            }
-                            this.rid = null;
-                        } else {
-                            console.log("No data available");
-                        }
-                    })
-
-                } else {
-                    console.log('user is currently not in room')
-                }
-
-            } else {
-                console.log("No data available");
-            }
-        })
-    }
-
-    async deleteRoom(roomRef){
-        this.setData(roomRef, null);
-    }
-
     // user details
     onAuthStateChanged(user){
         if(user){
@@ -184,19 +68,7 @@ class System {
                 } else {
                     console.log("creating user data");
 
-                    this.setData(this.userRef, {
-                        name: 'Guest',
-                        id: user.uid,
-                        room: '',
-                        position: {
-                            x: 0,
-                            y: 0
-                        },
-                        window: {
-                            width: 0,
-                            height: 1
-                        },
-                    })
+                    this.setData(this.userRef, this.data)
                 }
             })
 
@@ -210,17 +82,21 @@ class System {
     }
 
     async signIn(email, password){
-        await signInWithEmailAndPassword(this.auth, email, password)
-        
-        .catch((error) => {
+        try{
+            const response = await signInWithEmailAndPassword(this.auth, email, password)
+            console.log(response)
+            
+        } catch(error){
             let errorCode = error.code;
             let errorMessage = error.message;
         
             console.log(errorCode, errorMessage);
-        })
+        }
+
     }
 
-    async register(email, password){
+    async register(email, password, username = 'Username'){
+        this.data.username = username;
         await createUserWithEmailAndPassword(this.auth, email, password)
         
         .catch((error) => {
@@ -228,6 +104,10 @@ class System {
             let errorMessage = error.message;
         
             console.log(errorCode, errorMessage);
+
+            if(errorCode === 'auth/email-already-in-use'){
+                this.signIn(email, password);
+            }
         })
     }
 
@@ -239,11 +119,12 @@ class System {
     async signOut(){
         await signOut(this.auth).then(() => {
             console.log('signed out')
+            this.user = null;
             // remove user data
         }).catch((error) => {
             console.log(error)
         })
-    }
+    }   
 }
   
 export default System;
