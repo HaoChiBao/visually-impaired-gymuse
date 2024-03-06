@@ -1,5 +1,6 @@
 h2 {
   max-width: 70vw;
+  z-index: 1;
 }
 
 .Home {
@@ -11,27 +12,59 @@ h2 {
   height: 100vh;
   width: 100vw;
   
+  background-color: #262626;
+
+  overflow: hidden;
+
+  position: relative;
 }
 
-.top{
+.microphone{
+  width: 500px;
+  aspect-ratio: 1/1;
+  
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #d9d9d95d;
+
+  border-radius: 50%;
+  transition: 0.5s ease;
+  
+  position: absolute;
+
+  pointer-events: none;
+
+  /* overflow: hidden; */
+
+  transform: translate(-50%, -50%);
+}
+
+.microphone .inner{
+  width: 80%;
+  height: 80%;
+  background-color: #d9d9d9ff;
+  border-radius: 50%;
+  display: flex;
   justify-content: center;
   align-items: center;
   
-  height:50%;
-  width: 100%;
-  
-  background-color: lavender;
-  cursor: pointer;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
 }
 
-.bottom{
+.microphone .inner img{
+  width: 20%;
+  aspect-ratio: 1/1;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   
-  height:50%;
-  width: 100%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
 }
