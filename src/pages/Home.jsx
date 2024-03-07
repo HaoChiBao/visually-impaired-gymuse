@@ -19,7 +19,7 @@ const Home = () => {
     lock: '#90FF5B',
     off: '#FF5353'
   }
-  const [speech, setSpeech] = useState('Text Goes Here...')
+  const [speech, setSpeech] = useState('Hold to talk...')
   const [icon, setIcon] = useState(microphone)
   
   const main = async () => {
@@ -51,6 +51,7 @@ const Home = () => {
     const inner_element = document.querySelector('.microphone .inner')
     const CENTER = {x: 50, y: 50}
     const multiplier = 20
+    const swipeDistance = 300
 
     // const button = document.querySelector('button')
 
@@ -58,6 +59,7 @@ const Home = () => {
       try {
         await recognition.start()
         setSpeech('Listening...')
+        generateSpeech('Listening') // do not use await here because it will block the rest of the code
         speechOn = true
       } catch (error) {
         console.log(error)
@@ -68,12 +70,14 @@ const Home = () => {
       try {
         await recognition.abort()
         setSpeech('Not Listening...')
+        generateSpeech('No longer listening') // do not use await here because it will block the rest of the code
         speechOn = false
       } catch (error) {
         console.log(error)
       }
     }
 
+    // Open microphone element on DOM
     const openMicrophone = async (x, y) => {
       const microphone = document.querySelector('.microphone')
       microphone.style.width = '500px'
@@ -81,77 +85,97 @@ const Home = () => {
       microphone.style.top = y + 'px'
     }
 
+    // Close microphone element on DOM
     const closeMicrophone = async () => {
       const microphone = document.querySelector('.microphone')
       microphone.style.width = '0px'
+    }
+
+    // Reset microphone element on DOM (default colour and icon)
+    const resetMicrophone = async () => {
+      microphone_element.style.backgroundColor = MICROPHONE_COLOURS.hold + '5d'
+      inner_element.style.backgroundColor = MICROPHONE_COLOURS.hold + 'ff'
+      setIcon(microphone)
+      inner_element.style.left = `${CENTER.x}%`
+      inner_element.style.top = `${CENTER.y}%`
+
+      icon_element.style.left = `${CENTER.x}%`
+      icon_element.style.top = `${CENTER.y}%`  
+    }
+
+    const lockMicrophone = async () => {
+      resetMicrophone()
+      microphone_element.style.backgroundColor = MICROPHONE_COLOURS.lock + '5d'
+      inner_element.style.backgroundColor = MICROPHONE_COLOURS.lock + 'ff'
+      setIcon(lock)
+    }
+
+    const setMicrophoneOff = async () => {
+      microphone_element.style.backgroundColor = MICROPHONE_COLOURS.off + '5d'
+      inner_element.style.backgroundColor = MICROPHONE_COLOURS.off + 'ff'
+    }
+
+    const pulseMicrophone = async () => {
+      if(!speechOn) return
+      microphone_element.style.width = '550px'
+      setTimeout(() => {
+        if(!speechOn) return
+        microphone_element.style.width = '500px'
+      }, 100)
     }
 
     closeMicrophone()
 
     const mousePos = {x: 0, y: 0}
     let mouseDown = false
-    window.addEventListener('mousedown', async (e) => {
-      e.preventDefault()
-      const x = e.clientX
-      const y = e.clientY
+    let lockOn = false
+
+    // function for mousedown and touchdown
+    const handleEventDown = async (x,y) => {
       await turnRecognitionOn()
       openMicrophone(x, y)
       mousePos.x = x
       mousePos.y = y
-
       mouseDown = true
-    })
-
-    window.addEventListener('mouseup', async (e) => {
-      e.preventDefault()
-      const x = e.clientX
-      const y = e.clientY
-      
+    }
+    const handleEventUp = async (x,y) => {
       mouseDown = false
-      
-      // check if microphone swiped to lock
       const distance = Math.sqrt((x - mousePos.x)**2 + (y - mousePos.y)**2)
-      console.log(distance)
-      if (distance > 100) {
-        setIcon(lock)
-        microphone_element.style.backgroundColor = MICROPHONE_COLOURS.lock + '5d'
-
-        inner_element.style.backgroundColor = MICROPHONE_COLOURS.lock + 'ff' 
-        inner_element.style.left = `${CENTER.x}%`
-        inner_element.style.top = `${CENTER.y}%`
-
-        icon_element.style.left = `${CENTER.x}%`
-        icon_element.style.top = `${CENTER.y}%`
-
-        
-
+      if (distance > swipeDistance) {
+        lockMicrophone()  
+        lockOn = true
       } else {
         await turnRecognitionOff()
         closeMicrophone()
+        resetMicrophone()
+        lockOn = false
       }
-    })
-
-    window.addEventListener('mousemove', async (e) => {
-      e.preventDefault()
-
+    }
+    const handleEventMove = async (x,y) => {
       if(!mouseDown) return
-      const x = e.clientX
-      const y = e.clientY
-
       const offsetX = x - mousePos.x
       const offsetY = y - mousePos.y
-
       icon_element.style.left = `${CENTER.x + offsetX/window.innerWidth*multiplier*2}%`
       icon_element.style.top = `${CENTER.y + offsetY/window.innerHeight*multiplier*2}%`
-
       inner_element.style.left = `${CENTER.x + offsetX/window.innerWidth*multiplier}%`
       inner_element.style.top = `${CENTER.y + offsetY/window.innerHeight*multiplier}%`
-    })
+    }
+
+    window.addEventListener('mousedown', async (event) => {event.preventDefault(); handleEventDown(event.clientX, event.clientY)})
+    window.addEventListener('touchstart', async (event) => {handleEventDown(event.touches[0].clientX, event.touches[0].clientY)})
+
+    window.addEventListener('mouseup', async (event) => {event.preventDefault(); handleEventUp(event.clientX, event.clientY)})
+    window.addEventListener('touchend', async (event) => {handleEventUp(event.changedTouches[0].clientX, event.changedTouches[0].clientY)})
+
+    window.addEventListener('mousemove', async (event) => {event.preventDefault(); handleEventMove(event.clientX, event.clientY)})
+    window.addEventListener('touchmove', async (event) => {handleEventMove(event.touches[0].clientX, event.touches[0].clientY)})
 
     let timeout = null
     recognition.onresult = function (event) {
       const result = event.results[event.results.length - 1];
       const transcript = result[0].transcript;
+      // console.log(transcript)
+      pulseMicrophone()
 
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
@@ -159,7 +183,8 @@ const Home = () => {
 
         if (transcript.toLowerCase().includes(keyword.toLowerCase())){
           
-          await turnRecognitionOff('#ff7f7f')
+          await turnRecognitionOff()
+          setMicrophoneOff()
           
           // add user input to chat history
           chatHistory.push({role: 'user', content: transcript + contentAdd})
@@ -174,6 +199,9 @@ const Home = () => {
           // read out the response
           await generateSpeech(response)
 
+          if(lockOn) lockMicrophone()
+          else resetMicrophone()
+
           await turnRecognitionOn()
 
           setSpeech('Listening...')
@@ -184,8 +212,14 @@ const Home = () => {
       }, 500)
     }
   
-    recognition.onend = async function (event) {        
-      // console.log('Speech recognition has stopped...')
+    recognition.onend = async function (event) {     
+      console.log('Speech recognition ending...')
+      
+      // if the recognition timesout, turn it back on
+      if (speechOn) {
+        await turnRecognitionOn()
+      }
+
     }
   }
 
