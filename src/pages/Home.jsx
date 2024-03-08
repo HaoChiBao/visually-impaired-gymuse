@@ -62,7 +62,7 @@ const Home = () => {
         generateSpeech('Listening') // do not use await here because it will block the rest of the code
         speechOn = true
       } catch (error) {
-        console.log(error)
+        // console.log(error)
       }
     }
     
@@ -73,7 +73,7 @@ const Home = () => {
         generateSpeech('No longer listening') // do not use await here because it will block the rest of the code
         speechOn = false
       } catch (error) {
-        console.log(error)
+        // console.log(error)
       }
     }
 
@@ -169,6 +169,10 @@ const Home = () => {
 
     window.addEventListener('mousemove', async (event) => {event.preventDefault(); handleEventMove(event.clientX, event.clientY)})
     window.addEventListener('touchmove', async (event) => {handleEventMove(event.touches[0].clientX, event.touches[0].clientY)})
+
+
+    window.addEventListener('contextmenu', async (e) => {e.preventDefault()})
+    window.addEventListener('', async (e) => {e.preventDefault()})
 
     let timeout = null
     recognition.onresult = function (event) {
