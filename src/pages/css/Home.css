@@ -11,6 +11,12 @@ h2 {
   font-size: 2rem;
 
   pointer-events: none;
+  
+  /* remove touch events for mobile */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Standard syntax */
 }
 
 .Home {
