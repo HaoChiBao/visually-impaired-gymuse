@@ -13,8 +13,31 @@ const SPEAKER_COLOURS = {
     off: '#EBFF00'
 }
 
+const introText = [
+    'This is the register page, say next to continue',
+    'I will ask you a few personal questions to get to know you better',
+    'I will repeat your answers back to you, all you have to do to confirm is say yes or no',
+    'You will also be able edit your responses directly on the screen',
+    'Ready to begin?'
+
+]
+let introCounter = 0
+
+const triggerWords = [
+    'next', // next page of information
+    'repeat', // repeat page of information
+    'back' // go back to step page
+]
+
+const userDetails = {
+    name: '',
+    email: '',
+    age: -1,
+    weight: -1,
+}
+
 const Register = () => {
-    const [speech, setSpeech] = useState('This is the register page')
+    const [speech, setSpeech] = useState(introText[0])
     let speechOn = false
 
     let recognition = new window.webkitSpeechRecognition;
@@ -24,9 +47,7 @@ const Register = () => {
 
     const turnRecognitionOn = async () => {
         try {
-            await recognition.start()
-            setSpeech('Listening...')
-            generateSpeech('Listening') // do not use await here because it will block the rest of the code
+            await recognition.start() // do not use await here because it will block the rest of the code
             speechOn = true
         } catch (error) {
             // console.log(error)
@@ -35,13 +56,48 @@ const Register = () => {
     
     const turnRecognitionOff = async () => {
     try {
-        await recognition.abort()
-        setSpeech('Not Listening...')
-        generateSpeech('No longer listening') // do not use await here because it will block the rest of the code
+        await recognition.abort()// do not use await here because it will block the rest of the code
         speechOn = false
     } catch (error) {
         // console.log(error)
     }
+    }
+
+    let timeout = null
+    recognition.onresult = (event) => {
+        const last = event.results.length - 1
+        const speech = event.results[last][0].transcript
+        clearTimeout(timeout)
+        timeout = setTimeout(() => {
+            console.log(speech)
+            triggerWords.forEach(word => {
+                if (speech.includes(word)) {
+                    console.log(word)
+                    turnRecognitionOff()
+                    switch (word) {
+                        case 'next':
+                            introCounter++
+                            setSpeech(introText[introCounter])
+                            break
+                        case 'repeat':
+                            speak()
+                            break
+                        case 'back':
+                            console.log('going back')
+                            break
+                        default:
+                            break
+                    }
+
+                }
+            })
+        }, 700)
+    }
+
+    recognition.onend = () => {
+        if (speechOn) {
+            recognition.start()
+        }
     }
 
     const changeSpeakerBubble = (isSpeaking = true) => {
@@ -59,21 +115,24 @@ const Register = () => {
     
     }
 
-    useEffect(() => {
-        console.log('Register')
-    }, [])
+    const speak = async () => {
+        changeSpeakerBubble()
+        await generateSpeech(speech)
+        changeSpeakerBubble(false)
+        turnRecognitionOn()
+    }
 
     useEffect(() => {
-        const main = async () => {
-            changeSpeakerBubble()
-            await generateSpeech(speech)
-            changeSpeakerBubble(false)
+        speak()
+
+        if(speechOn) {
+            turnRecognitionOn()
         }
-        main()
+
     }, [speech])
 
     return (
-        <div className="Register">
+        <div className="Register" onClick={speak}>
             <div className="top">
                 <SpeakerBubble/>
             </div>
