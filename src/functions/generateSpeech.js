@@ -14,7 +14,8 @@ const generateSpeech = async (text) => {
     
           voice: { 
             languageCode: 'en-US', 
-            name: "en-US-Studio-O"
+            name: "en-US-Journey-D"
+            // name: "en-US-Studio-O"
           },
     
           audioConfig: { 

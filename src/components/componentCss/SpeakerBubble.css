@@ -1,13 +1,15 @@
 .speakerBubble {
     background-color: #EBFF005d;
     border-radius: 50%;
-    width: 300px;
+    height: 30vh;
     aspect-ratio: 1/1;
     
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+
+    transition: 0.3s ease;
 }
 
 .speakerBubble .inner {
@@ -17,6 +19,7 @@
     
     border-radius: 50%;
     position: relative;
+    transition: 0.3s ease;
 }
 
 .speakerBubble .inner img{
@@ -31,3 +34,15 @@
     top: 50%;
     left: 50%;
 }
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+} 
