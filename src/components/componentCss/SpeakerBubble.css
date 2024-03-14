@@ -1,0 +1,33 @@
+.speakerBubble {
+    background-color: #EBFF005d;
+    border-radius: 50%;
+    width: 300px;
+    aspect-ratio: 1/1;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.speakerBubble .inner {
+    background-color: #EBFF00ff;
+    width: 75%;
+    aspect-ratio: 1/1;
+    
+    border-radius: 50%;
+    position: relative;
+}
+
+.speakerBubble .inner img{
+    width: 50%;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+}

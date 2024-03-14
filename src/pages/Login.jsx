@@ -34,56 +34,60 @@ const Login = () => {
             system.register(email, password, value);
         }
     }
+    
+    let recognition = new window.webkitSpeechRecognition;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
 
-    useEffect(() => {
-        let recognition = new window.webkitSpeechRecognition;
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.lang = "en-US";
+    // const button = document.querySelector('button')
 
-        // const button = document.querySelector('button')
-
-        const turnRecognitionOn = async () => {
-            try {
-                await recognition.start()
-                setSpeech('Listening...')
-                speechOn = true
-            } catch (error) {
-                console.log(error)
-            }
+    const turnRecognitionOn = async () => {
+        try {
+            await recognition.start()
+            setSpeech('Listening...')
+            speechOn = true
+        } catch (error) {
+            console.log(error)
         }
-        
-        const turnRecognitionOff = async () => {
-            try {
-                await recognition.abort()
-                setSpeech('Not Listening...')
-                speechOn = false
-            } catch (error) {
-                console.log(error)
-            }
+    }
+    
+    const turnRecognitionOff = async () => {
+        try {
+            await recognition.abort()
+            setSpeech('Not Listening...')
+            speechOn = false
+        } catch (error) {
+            console.log(error)
         }
-
-        turnRecognitionOn()
-
-        let timeout = null
-        recognition.onresult = function (event) {
+    }
+    
+    let timeout = null
+    recognition.onresult = function (event) {
         const result = event.results[event.results.length - 1];
         let transcript = result[0].transcript;
 
         clearTimeout(timeout)
         timeout = setTimeout(async () => {
+            console.log(transcript)
+            setSpeech(transcript)
+
+            
             transcript = transcript.toLowerCase()
             transcript = transcript.trim()
-            console.log(transcript)
             const transcriptArray = transcript.split(' ')
             setSpeechBubbles(transcriptArray)
-            setSpeech(transcript)
         }, 500)
-        }
+    }
+
+    recognition.onend = async function (event) {        
+    // console.log('Speech recognition has stopped...')
+    }
     
-        recognition.onend = async function (event) {        
-        // console.log('Speech recognition has stopped...')
-        }
+    useEffect(() => {
+
+        turnRecognitionOn()
+
     },[]);
 
     return (

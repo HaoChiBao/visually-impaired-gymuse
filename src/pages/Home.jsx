@@ -9,6 +9,7 @@ import System from '../auth/system'
 import microphone from '../images/microphone.png'
 import lock from '../images/padlock.png'
 import unlock from '../images/padlock-unlock.png'
+import speaking from '../images/speaking2.png'
 
 const system = new System()
 
@@ -189,6 +190,7 @@ const Home = () => {
           
           await turnRecognitionOff()
           setMicrophoneOff()
+          setIcon(speaking)
           
           // add user input to chat history
           chatHistory.push({role: 'user', content: transcript + contentAdd})

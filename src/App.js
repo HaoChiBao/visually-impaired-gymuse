@@ -1,5 +1,6 @@
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register';
 
 import Test from './pages/Test';
 
@@ -12,6 +13,7 @@ function App() {
       <Route exact path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/test" element={<Test />} />
+      <Route path="/register" element={<Register />} />
     </Routes>
   );
 }
