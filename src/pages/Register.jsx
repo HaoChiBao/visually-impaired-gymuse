@@ -91,6 +91,7 @@ const Register = () => {
             setTranscript(speech)
             triggerWords.forEach(async (word) => {
                 if (speech.includes(word)) {
+                    turnRecognitionOff()
                     switch (word) {
                         case 'next':
                             nextPage()
@@ -118,6 +119,7 @@ const Register = () => {
                         default:
                             break
                     }
+                    turnRecognitionOn()
                 }
             })
         }, 700)
