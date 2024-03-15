@@ -1,11 +1,16 @@
 import './css/Home.css';
 import { useState, useEffect } from 'react';
 
+// components
+import SpeechFooter from '../components/SpeechFooter';
+
+// functions
 import generateResponse from '../functions/generateResponse'
 import generateSpeech from '../functions/generateSpeech'
 
 import System from '../auth/system'
 
+// icons
 import microphone from '../images/microphone.png'
 import lock from '../images/padlock.png'
 import unlock from '../images/padlock-unlock.png'
@@ -21,6 +26,7 @@ const Home = () => {
     off: '#FF5353'
   }
   const [speech, setSpeech] = useState('Hold to talk...')
+  const [transcript, setTranscript] = useState('what you say appears here...')
   const [icon, setIcon] = useState(microphone)
   
   const main = async () => {
@@ -185,6 +191,7 @@ const Home = () => {
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
         console.log(transcript)
+        setTranscript(transcript)
 
         if (transcript.toLowerCase().includes(keyword.toLowerCase())){
           
@@ -235,15 +242,16 @@ const Home = () => {
 
   return (
     <div className = 'Home'>
-        <h2>
-          {speech}
-        </h2>
+      <h2>
+        {speech}
+      </h2>
 
-        <div className="microphone">
-          <div className="inner">
-            <img src={icon} alt="" />
-          </div>
+      <div className="microphone">
+        <div className="inner">
+          <img src={icon} alt="" />
         </div>
+      </div>
+      <SpeechFooter speech = {transcript} />
     </div>
   );
 }
