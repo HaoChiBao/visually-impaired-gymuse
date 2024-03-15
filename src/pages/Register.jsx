@@ -91,7 +91,6 @@ const Register = () => {
             setTranscript(speech)
             triggerWords.forEach(async (word) => {
                 if (speech.includes(word)) {
-                    await turnRecognitionOff()
                     switch (word) {
                         case 'next':
                             nextPage()
@@ -119,7 +118,6 @@ const Register = () => {
                         default:
                             break
                     }
-                    await turnRecognitionOn()
                 }
             })
         }, 700)
@@ -127,9 +125,9 @@ const Register = () => {
 
     recognition.onend = () => {
         console.log('Speech recognition ending...')
-        if (speechOn) {
-            recognition.start()
-        }
+        // if (speechOn) {
+        //     recognition.start()
+        // }
     }
 
     const nextPage = () => {
@@ -166,7 +164,11 @@ const Register = () => {
         turnRecognitionOff()
         changeSpeakerBubble()
 
+        const timer = setTimeout(() => {console.log('Speech took too long...')}, 10000)
+
         await generateSpeech(speech)
+
+        clearTimeout(timer)
 
         // turn off or reset everything after the speech
         changeSpeakerBubble(false)
