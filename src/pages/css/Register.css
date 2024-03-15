@@ -22,7 +22,7 @@
 }
 
 .Register .bottom {
-    padding-top: 20px;
+    /* padding-top: 20px; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -38,8 +38,29 @@
 
     max-width: 70vw;
 
-    color:#ffd000;
+    /* color:#ffd000; */
     background-color: rgb(22, 22, 22);
     padding: 5px 10px;
     border-radius: 10px;
+}
+
+.Register input {
+    max-width: 70vw;
+    height: 50px;
+    margin: 10px 0;
+    
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background-color: #000000;
+    
+    color:#ffd000;
+    font-weight: bold;
+    font-size: 3rem;
+    text-align: center;
+}
+
+.Register input:focus {
+    outline: none;
+    border: 2px solid #ffd000;
 }
