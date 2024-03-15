@@ -182,6 +182,11 @@ const Register = () => {
     
     }
 
+    const handleInput = (e) => {
+        const value = e.target.value + e.key
+        console.log(value)
+    }
+
     let isSpeaking = false
     const speak = async () => {
         if(isSpeaking) {console.error('NOTE: something is already being said') ; return}
@@ -229,7 +234,7 @@ const Register = () => {
             </div>
             <div className="bottom">
                 <p>{speech}</p>
-                <input type="text" placeholder='details...'/>
+                <input type="text" placeholder='details...' onKeyDown={handleInput}/>
             </div>
             <SpeechFooter speech={transcript}/>
         </div>
