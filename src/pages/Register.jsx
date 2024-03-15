@@ -133,27 +133,28 @@ const Register = () => {
     
     }
 
-    const speak = async (transcript = null) => {
+    const speak = async () => {
         turnRecognitionOff()
         changeSpeakerBubble()
-        if(transcript) await generateSpeech(transcript)
-        else await generateSpeech(speech)
+        await generateSpeech(speech)
         changeSpeakerBubble(false)
         turnRecognitionOn()
     }
-
+    
     let reminder = null
     useEffect(() => {
         speak()
-
+        
         if(speechOn) {
             turnRecognitionOn()
         }
-
+        
         // if the user is inactive for 1 minute, remind them that the system is still listening
         clearTimeout(reminder)
-        reminder = setTimeout(() => {
-            speak('Hey are you still there? Say "NEXT" to continue or "REPEAT" to hear the information again or say "BACK" to go to the previous page')
+        reminder = setTimeout(async () => {
+            changeSpeakerBubble()
+            await generateSpeech('Hey are you still there? Say "NEXT" to continue or "REPEAT" to hear the information again or say "BACK" to go to the previous page')
+            changeSpeakerBubble(false)
         }, 60000)
     }, [speech])
 
