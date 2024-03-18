@@ -11,6 +11,8 @@ import generateSpeech from '../functions/generateSpeech';
 import getNumberFromString from '../functions/getNumberFromString';
 import { get } from 'firebase/database';
 
+const system = new System()
+
 const SPEAKER_COLOURS = {
     on: '#FF5353',
     off: '#ffd000'
@@ -36,6 +38,8 @@ const questionsTest = [
 
 let questionCounter = 0
 
+const finishText = 'Thank you for your time. I am setting up your account now'
+
 const triggerWords = [
     'next', // next page of information
     'repeat', // repeat page of information
@@ -54,6 +58,7 @@ const userDetails = {
     email: '',
     age: -1,
     weight: -1,
+    password: '',
 }
 
 let reminder = null // reminder to user that the system is still listening
@@ -80,6 +85,15 @@ const Register = () => {
             recognition.start() 
         } catch (error) {
             // console.log(error)
+        }
+    }
+
+    const generateUser = () => {
+        const max = 5
+        for(let i = 0; i < max; i++) {
+            const username = `${userDetails.name}${i}`
+            const email = `${username}@gmail.com`
+            // system.register(email, 'password', username)
         }
     }
     
@@ -170,7 +184,6 @@ const Register = () => {
     }
 
     const nextPage = () => {
-        console.log(questionCounter, introCounter)
         if (introCounter < introText.length ) {
             introCounter++
             setSpeech(introText[introCounter-1])
@@ -183,11 +196,15 @@ const Register = () => {
                 setSpeech(questionsTest[questionCounter-1] + ' ' + userDetails[questionsTest[questionCounter-1].split(' ')[2]])
                 openUserInput(userDetails[questionsTest[questionCounter-1].split(' ')[2]])
             }
+        } else {
+            console.log('done')
+            setSpeech(finishText)
+            closeUserInput()
+            generateUser()
         }
     }
 
     const previousPage = () => {
-        console.log(questionCounter, introCounter)
         if(questionCounter > 1) {
             questionCounter--
             if(questionCounter % 2 == 0) {
@@ -222,7 +239,17 @@ const Register = () => {
 
     const handleInput = (e) => {
         const value = e.target.value + e.key
-        console.log(value)
+        if(questionCounter == 2){
+            // name
+            userDetails.name = value
+        } else if (questionCounter == 4) {
+            // weight
+            userDetails.weight = value
+        } else if (questionCounter == 6){
+            //age
+            userDetails.age = value
+        }
+        console.log(userDetails)
     }
 
     let isSpeaking = false
