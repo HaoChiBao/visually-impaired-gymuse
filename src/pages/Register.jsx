@@ -17,13 +17,13 @@ const SPEAKER_COLOURS = {
 }
 
 const introText = [
-    // 'This is the register page. Say "NEXT" to continue ',
-    // 'I will ask you a few personal questions to get to know you better. I will repeat your answers back to you, all you have to do to confirm is say yes or no',
-    // 'You will also be able to edit your responses directly on the screen',
-    // 'If I go too fast you can say "REPEAT" to hear the information again or say "BACK" to go to the previous page',
+    'This is the register page. Say "NEXT" to continue ',
+    'I will ask you a few personal questions to get to know you better. I will repeat your answers back to you, all you have to do to confirm is say yes or no',
+    'You will also be able to edit your responses directly on the screen',
+    'If I go too fast you can say "REPEAT" to hear the information again or say "BACK" to go to the previous page',
     'Ready to begin?',
 ]
-let introCounter = 0
+let introCounter = 1
 
 const questionsTest = [
     'What is your name? Say "MY NAME IS", and then followed by your name',
@@ -44,6 +44,9 @@ const triggerWords = [
     'my name is',
     'my weight is',
     'my age is',
+
+    'yes', // confirm the information
+    'no', // deny the information
 ]
 
 const userDetails = {
@@ -70,7 +73,11 @@ const Register = () => {
     const turnRecognitionOn = async () => {
         speechOn = true
         try {
-            await recognition.start() // do not use await here because it will block the rest of the code
+            // check if recognition is already on
+            if (recognition && recognition.state === 'running') {
+                return
+            }
+            recognition.start() 
         } catch (error) {
             // console.log(error)
         }
@@ -96,6 +103,7 @@ const Register = () => {
         const input = document.querySelector('input')
         input.style.opacity = 0
         input.style.pointerEvents = 'none'
+        input.value = ''
     }
 
     recognition.onresult = (event) => {
@@ -116,7 +124,7 @@ const Register = () => {
                             await speak()
                             break
                         case 'back':
-                            console.log('going back')
+                            previousPage()
                             break
 
                         case 'my name is':
@@ -135,10 +143,20 @@ const Register = () => {
                             nextPage()
                             break
 
+                        case 'yes':
+                            if(introCounter >= introText.length - 1 && questionCounter <= 0){
+                                console.log(0)
+                                nextPage()
+                            } else if (questionCounter % 2 == 0 && questionCounter > 0) {
+                                nextPage()
+                            } else {
+                                turnRecognitionOn()
+                            }
+                            break;
+
                         default:
                             break
                     }
-                    turnRecognitionOn()
                 }
             })
         }, 700)
@@ -152,18 +170,38 @@ const Register = () => {
     }
 
     const nextPage = () => {
-        if (introCounter < introText.length - 1) {
+        console.log(questionCounter, introCounter)
+        if (introCounter < introText.length ) {
             introCounter++
-            setSpeech(introText[introCounter])
+            setSpeech(introText[introCounter-1])
         } else if (questionCounter < questionsTest.length) {
-            if(questionCounter % 2 === 0) {
+            if (questionCounter < questionsTest.length) questionCounter++
+            if((questionCounter - 1) % 2 === 0) {
+                setSpeech(questionsTest[questionCounter-1])
+                closeUserInput()
+            } else {
+                setSpeech(questionsTest[questionCounter-1] + ' ' + userDetails[questionsTest[questionCounter-1].split(' ')[2]])
+                openUserInput(userDetails[questionsTest[questionCounter-1].split(' ')[2]])
+            }
+        }
+    }
+
+    const previousPage = () => {
+        console.log(questionCounter, introCounter)
+        if(questionCounter > 1) {
+            questionCounter--
+            if(questionCounter % 2 == 0) {
                 setSpeech(questionsTest[questionCounter])
                 closeUserInput()
             } else {
                 setSpeech(questionsTest[questionCounter] + ' ' + userDetails[questionsTest[questionCounter].split(' ')[2]])
                 openUserInput(userDetails[questionsTest[questionCounter].split(' ')[2]])
             }
-            questionCounter++
+        } else if (introCounter > 0 || introText.length - 1 == introCounter) {
+            if(introCounter != introText.length - 1) introCounter-- //decrement the counter again if it is not the last page
+            if (questionCounter > 0) questionCounter = 0 // reset the question counter
+            setSpeech(introText[introCounter])
+            closeUserInput()
         }
     }
 

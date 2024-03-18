@@ -189,9 +189,9 @@ const Home = () => {
       pulseMicrophone()
 
       clearTimeout(timeout)
+      setTranscript(transcript)
       timeout = setTimeout(async () => {
         console.log(transcript)
-        setTranscript(transcript)
 
         if (transcript.toLowerCase().includes(keyword.toLowerCase())){
           
