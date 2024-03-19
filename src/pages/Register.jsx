@@ -18,16 +18,15 @@ const SPEAKER_COLOURS = {
     off: '#ffd000'
 }
 
-const introText = [
+const pageText = [
+    // introduction
     'This is the register page. Say "NEXT" to continue ',
     'I will ask you a few personal questions to get to know you better. I will repeat your answers back to you, all you have to do to confirm is say yes or no',
     'You will also be able to edit your responses directly on the screen',
     'If I go too fast you can say "REPEAT" to hear the information again or say "BACK" to go to the previous page',
     'Ready to begin?',
-]
-let introCounter = 1
 
-const questionsTest = [
+    // user information
     'What is your name? Say "MY NAME IS", and then followed by your name',
     'Is your name',
     'What is your approximate weight in kilograms? Say "MY WEIGHT IS", and then followed by your weight',
@@ -36,9 +35,7 @@ const questionsTest = [
     'Is your age',
 ]
 
-let questionCounter = 0
-
-const finishText = 'Thank you for your time. I am setting up your account now'
+let pageCounter = 0
 
 const triggerWords = [
     'next', // next page of information
@@ -63,9 +60,12 @@ const userDetails = {
 
 let reminder = null // reminder to user that the system is still listening
 let timeout = null // timeout to wait for user to finish speaking
+let inputTimer = null
+
+let isSpeaking = false
 
 const Register = () => {
-    const [speech, setSpeech] = useState(introText[0])
+    const [speech, setSpeech] = useState(pageText[0])
     const [transcript, setTranscript] = useState('what you say appears here...')
     const [userInput, setUserInput] = useState('')
     let speechOn = false
@@ -120,105 +120,30 @@ const Register = () => {
         input.value = ''
     }
 
-    recognition.onresult = (event) => {
-        const last = event.results.length - 1
-        let speech = event.results[last][0].transcript
-        speech = speech.toLowerCase()
-        setTranscript(speech)
-        clearTimeout(timeout)
-        timeout = setTimeout(() => {
-            triggerWords.forEach(async (word) => {
-                if (speech.includes(word)) {
-                    turnRecognitionOff()
-                    switch (word) {
-                        case 'next':
-                            nextPage()
-                            break
-                        case 'repeat':
-                            await speak()
-                            break
-                        case 'back':
-                            previousPage()
-                            break
+    const goToPage = (num) => {
+        pageCounter = num
 
-                        case 'my name is':
-                            const name = speech.split('my name is')[1].trim()
-                            userDetails.name = name
-                            nextPage()
-                            break
-                        case 'my weight is':
-                            const weight = getNumberFromString(speech)[0]
-                            userDetails.weight = weight
-                            nextPage()
-                            break
-                        case 'my age is':
-                            const age = getNumberFromString(speech)[0]
-                            userDetails.age = age
-                            nextPage()
-                            break
+        if (pageText[pageCounter].includes('Is your')){
+            setSpeech(pageText[pageCounter] + ' ' + userDetails[pageText[pageCounter].split(' ')[2]])
+            openUserInput(userDetails[pageText[pageCounter].split(' ')[2]])
+        } else {
+            setSpeech(pageText[pageCounter])
+            closeUserInput()
+        }
 
-                        case 'yes':
-                            if(introCounter >= introText.length - 1 && questionCounter <= 0){
-                                console.log(0)
-                                nextPage()
-                            } else if (questionCounter % 2 == 0 && questionCounter > 0) {
-                                nextPage()
-                            } else {
-                                turnRecognitionOn()
-                            }
-                            break;
-
-                        default:
-                            break
-                    }
-                }
-            })
-        }, 700)
-    }
-
-    recognition.onend = () => {
-        console.log('Speech recognition ending...')
-        // if (speechOn) {
-        //     recognition.start()
-        // }
     }
 
     const nextPage = () => {
-        if (introCounter < introText.length ) {
-            introCounter++
-            setSpeech(introText[introCounter-1])
-        } else if (questionCounter < questionsTest.length) {
-            if (questionCounter < questionsTest.length) questionCounter++
-            if((questionCounter - 1) % 2 === 0) {
-                setSpeech(questionsTest[questionCounter-1])
-                closeUserInput()
-            } else {
-                setSpeech(questionsTest[questionCounter-1] + ' ' + userDetails[questionsTest[questionCounter-1].split(' ')[2]])
-                openUserInput(userDetails[questionsTest[questionCounter-1].split(' ')[2]])
-            }
-        } else {
-            console.log('done')
-            setSpeech(finishText)
-            closeUserInput()
-            generateUser()
+        if(pageCounter < pageText.length - 1) {
+            pageCounter++
+            goToPage(pageCounter)
         }
     }
 
     const previousPage = () => {
-        if(questionCounter > 1) {
-            questionCounter--
-            if(questionCounter % 2 == 0) {
-                setSpeech(questionsTest[questionCounter])
-                closeUserInput()
-            } else {
-                setSpeech(questionsTest[questionCounter] + ' ' + userDetails[questionsTest[questionCounter].split(' ')[2]])
-                openUserInput(userDetails[questionsTest[questionCounter].split(' ')[2]])
-            }
-        } else if (introCounter > 0 || introText.length - 1 == introCounter) {
-            if(introCounter != introText.length - 1) introCounter-- //decrement the counter again if it is not the last page
-            if (questionCounter > 0) questionCounter = 0 // reset the question counter
-            setSpeech(introText[introCounter])
-            closeUserInput()
+        if(pageCounter > 0){
+            pageCounter--
+            goToPage(pageCounter)
         }
     }
 
@@ -239,38 +164,49 @@ const Register = () => {
 
     const handleInput = (e) => {
         const value = e.target.value + e.key
-        if(questionCounter == 2){
+        console.log(pageCounter)
+        if(pageCounter == 6){
             // name
             userDetails.name = value
-        } else if (questionCounter == 4) {
+            clearTimeout(inputTimer)
+            inputTimer = setTimeout(() => {
+                setSpeech(`Is your name ${value}?`)
+            },500)
+        } else if (pageCounter == 8) {
+            clearTimeout(inputTimer)
+            inputTimer = setTimeout(() => {
+                setSpeech(`Is your weight ${value}?`)
+            },500)
             // weight
             userDetails.weight = value
-        } else if (questionCounter == 6){
+        } else if (pageCounter == 10){
+            clearTimeout(inputTimer)
+            inputTimer = setTimeout(() => {
+                setSpeech(`Is your age ${value}?`)
+            },500)
             //age
             userDetails.age = value
         }
-        console.log(userDetails)
     }
 
-    let isSpeaking = false
+    
     const speak = async () => {
         if(isSpeaking) {console.error('NOTE: something is already being said') ; return}
         console.log (userDetails)
         // functions that run before the speech
         isSpeaking = true
-        turnRecognitionOff()
         changeSpeakerBubble()
 
         const timer = setTimeout(() => {console.log('Speech took too long...')}, 10000)
 
         await generateSpeech(speech)
-
+        
         clearTimeout(timer)
-
+        
         // turn off or reset everything after the speech
         changeSpeakerBubble(false)
-        turnRecognitionOn()
         isSpeaking = false
+        turnRecognitionOn()
         
         // if the user is inactive for 1 minute, remind them that the system is still listening
         clearTimeout(reminder)
@@ -281,6 +217,66 @@ const Register = () => {
             changeSpeakerBubble(false)
             turnRecognitionOn()
         }, 60000)
+    }
+
+    recognition.onresult = (event) => {
+        if(!isSpeaking) {
+            const last = event.results.length - 1
+            let speech = event.results[last][0].transcript
+            speech = speech.toLowerCase()
+            setTranscript(speech)
+            clearTimeout(timeout)
+            timeout = setTimeout(() => {
+                triggerWords.forEach(async (word) => {
+                    if (speech.includes(word)) {
+                        // turnRecognitionOff()
+                        switch (word) {
+                            case 'next':
+                                nextPage()
+                                break
+                            case 'repeat':
+                                await speak()
+                                break
+                            case 'back':
+                                previousPage()
+                                break
+
+                            case 'my name is':
+                                const name = speech.split('my name is')[1].trim()
+                                userDetails.name = name
+                                goToPage(6)
+                                break
+                            case 'my weight is':
+                                const weight = getNumberFromString(speech)[0]
+                                userDetails.weight = weight
+                                goToPage(8)
+                                break
+                            case 'my age is':
+                                const age = getNumberFromString(speech)[0]
+                                userDetails.age = age
+                                goToPage(10)
+                                break
+
+                            case 'yes':
+                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10){
+                                    nextPage()
+                                }
+                                break;
+
+                            default:
+                                break
+                        }
+                    }
+                })
+            }, 700)
+        }
+    }
+
+    recognition.onend = () => {
+        console.log('Speech recognition ending...')
+        // if (speechOn) {
+        //     recognition.start()
+        // }
     }
     
     useEffect(() => {
