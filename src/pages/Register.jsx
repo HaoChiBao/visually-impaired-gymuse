@@ -61,6 +61,7 @@ const userDetails = {
 let reminder = null // reminder to user that the system is still listening
 let timeout = null // timeout to wait for user to finish speaking
 let inputTimer = null
+let speechOn = false
 
 let isSpeaking = false
 
@@ -68,7 +69,6 @@ const Register = () => {
     const [speech, setSpeech] = useState(pageText[0])
     const [transcript, setTranscript] = useState('what you say appears here...')
     const [userInput, setUserInput] = useState('')
-    let speechOn = false
 
     let recognition = new window.webkitSpeechRecognition;
     recognition.continuous = true;
@@ -78,13 +78,9 @@ const Register = () => {
     const turnRecognitionOn = async () => {
         speechOn = true
         try {
-            // check if recognition is already on
-            if (recognition && recognition.state === 'running') {
-                return
-            }
             recognition.start() 
         } catch (error) {
-            // console.log(error)
+            console.error(error)
         }
     }
 
@@ -100,9 +96,10 @@ const Register = () => {
     const turnRecognitionOff = async () => {
         speechOn = false
         try {
-            await recognition.abort()// do not use await here because it will block the rest of the code
+            recognition.stop()
+            // await recognition.abort()// do not use await here because it will block the rest of the code
         } catch (error) {
-            // console.log(error)
+            console.error(error)
         }
     }
     
@@ -137,6 +134,8 @@ const Register = () => {
         if(pageCounter < pageText.length - 1) {
             pageCounter++
             goToPage(pageCounter)
+        } else {
+            console.log('ending...')
         }
     }
 
@@ -196,10 +195,12 @@ const Register = () => {
         // functions that run before the speech
         isSpeaking = true
         changeSpeakerBubble()
-
+        
         const timer = setTimeout(() => {console.log('Speech took too long...')}, 10000)
-
+        
+        turnRecognitionOff()
         await generateSpeech(speech)
+        turnRecognitionOn()
         
         clearTimeout(timer)
         
@@ -211,11 +212,13 @@ const Register = () => {
         // if the user is inactive for 1 minute, remind them that the system is still listening
         clearTimeout(reminder)
         reminder = setTimeout(async () => {
-            turnRecognitionOff()
+            isSpeaking = true
             changeSpeakerBubble()
+            turnRecognitionOff()
             await generateSpeech('Hey are you still there? Say "NEXT" to continue or "REPEAT" to hear the information again or say "BACK" to go to the previous page')
-            changeSpeakerBubble(false)
             turnRecognitionOn()
+            changeSpeakerBubble(false)
+            isSpeaking = false
         }, 60000)
     }
 
@@ -262,6 +265,12 @@ const Register = () => {
                                     nextPage()
                                 }
                                 break;
+                                
+                            case 'no':
+                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10){
+                                    previousPage()
+                                }
+                                break
 
                             default:
                                 break
