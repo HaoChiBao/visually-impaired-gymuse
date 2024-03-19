@@ -57,23 +57,23 @@ const triggerWords = [
     'complete password', // indicates that the user is done speaking their password sentence
 ]
 
-const userDetails = {
-    name: '',
-    email: '',
-    age: -1,
-    weight: -1,
-    password: '',
-    id: '',
-}
-
 // const userDetails = {
-//     name: 'james',
+//     name: '',
 //     email: '',
-//     age: 19,
-//     weight: 80,
-//     password: 'i like turtles',
-//     id: -1,
+//     age: -1,
+//     weight: -1,
+//     password: '',
+//     id: '',
 // }
+
+const userDetails = {
+    name: 'james',
+    email: '',
+    age: 19,
+    weight: 80,
+    password: 'i like turtles',
+    id: -1,
+}
 
 let registerDone = false
 
@@ -105,12 +105,15 @@ const Register = () => {
     }
 
     const generateUser = async () => {
+        console.log('Generating user...')
         if(userDetails.name == '' || userDetails.age == -1 || userDetails.weight == -1 || userDetails.password == '') {
             console.error('User details are not complete')
             return
         }
         const name = (userDetails.name).replace(' ', '-').toLowerCase()
-        const id = parseInt(await system.getUserNumber(name)) + 1
+        let id = await system.getUserNumber(name)
+        if(id == -1) { console.error('Error getting user number') ; return}
+        id = parseInt(id) + 1
         
         const username = `${name}-${id}`
         const email = `${username}@gmail.com`
@@ -347,9 +350,9 @@ const Register = () => {
 
     recognition.onend = () => {
         console.log('Speech recognition ending...')
-        if (speechOn) {
-            recognition.start()
-        }
+        // if (speechOn) {
+        //     recognition.start()
+        // }
     }
     
     useEffect(() => {
