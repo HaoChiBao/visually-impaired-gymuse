@@ -347,9 +347,9 @@ const Register = () => {
 
     recognition.onend = () => {
         console.log('Speech recognition ending...')
-        // if (speechOn) {
-        //     recognition.start()
-        // }
+        if (speechOn) {
+            recognition.start()
+        }
     }
     
     useEffect(() => {
