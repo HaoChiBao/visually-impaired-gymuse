@@ -96,17 +96,54 @@ class System {
     }
 
     async register(email, password, username = 'Username'){
-        this.data.username = username;
-        await createUserWithEmailAndPassword(this.auth, email, password)
-        
-        .catch((error) => {
-            let errorCode = error.code;
-            let errorMessage = error.message;
-        
-            console.log(errorCode, errorMessage);
+        return new Promise( async (resolve, reject) => {
+            this.data.username = username;
+            await createUserWithEmailAndPassword(this.auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log(user)
+                resolve(true);
+            })
+            .catch((error) => {
+                let errorCode = error.code;
+                let errorMessage = error.message;
+                
+                console.log(errorCode, errorMessage);
+                
+                resolve(false);
+                if(errorCode === 'auth/email-already-in-use'){
+                    this.signIn(email, password);
+                    return true
+                } else {
+                }
+            })
+        })
+    }
 
-            if(errorCode === 'auth/email-already-in-use'){
-                this.signIn(email, password);
+    async getUserNumber(username){
+        return new Promise( async (resolve, reject) => {
+            const nameRef = ref(this.db, 'names/' + username);
+            const snapshot = await get(nameRef);
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                resolve(data);
+            } else {
+                resolve(0);
+            }
+        })
+    }
+
+    async addUserNumber(username){
+        return new Promise( async (resolve, reject) => {
+            const nameRef = ref(this.db, 'names/' + username);
+            const snapshot = await get(nameRef);
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                await set(nameRef, data + 1);
+                resolve(data + 1);
+            } else {
+                await set(nameRef, 0);
+                resolve(0);
             }
         })
     }

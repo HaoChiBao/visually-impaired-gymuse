@@ -1,5 +1,6 @@
 import './css/Register.css';
 import { useState, useEffect } from 'react';
+import {  } from 'react-router-dom';
 
 // components
 import SpeakerBubble from '../components/SpeakerBubble';
@@ -9,7 +10,6 @@ import SpeechFooter from '../components/SpeechFooter';
 import System from '../auth/system';
 import generateSpeech from '../functions/generateSpeech';
 import getNumberFromString from '../functions/getNumberFromString';
-import { get } from 'firebase/database';
 
 const system = new System()
 
@@ -17,7 +17,7 @@ const SPEAKER_COLOURS = {
     on: '#FF5353',
     off: '#ffd000'
 }
-
+// system.signOut()
 const pageText = [
     // introduction
     'This is the register page. Say "NEXT" to continue ',
@@ -33,6 +33,11 @@ const pageText = [
     'Is your weight',
     'What is your age? Say "MY AGE IS", and then followed by your age',
     'Is your age',
+
+    'Perfect! Please think of a sentence I will use it as your password', //this page automatically goes to the next
+    'Use sentences like "I really enjoy going to the gym," so that it is easy to remember', // this page automatically goes to the next
+    'Say "COMPLETE PASSWORD" after your sentence so I know you are done', // this page automatically goes to the next
+    'Is this correct?',
 ]
 
 let pageCounter = 0
@@ -48,6 +53,8 @@ const triggerWords = [
 
     'yes', // confirm the information
     'no', // deny the information
+
+    'complete password', // indicates that the user is done speaking their password sentence
 ]
 
 const userDetails = {
@@ -56,7 +63,19 @@ const userDetails = {
     age: -1,
     weight: -1,
     password: '',
+    id: '',
 }
+
+// const userDetails = {
+//     name: 'james',
+//     email: '',
+//     age: 19,
+//     weight: 80,
+//     password: 'i like turtles',
+//     id: -1,
+// }
+
+let registerDone = false
 
 let reminder = null // reminder to user that the system is still listening
 let timeout = null // timeout to wait for user to finish speaking
@@ -66,6 +85,7 @@ let speechOn = false
 let isSpeaking = false
 
 const Register = () => {
+
     const [speech, setSpeech] = useState(pageText[0])
     const [transcript, setTranscript] = useState('what you say appears here...')
     const [userInput, setUserInput] = useState('')
@@ -84,12 +104,26 @@ const Register = () => {
         }
     }
 
-    const generateUser = () => {
-        const max = 5
-        for(let i = 0; i < max; i++) {
-            const username = `${userDetails.name}${i}`
-            const email = `${username}@gmail.com`
-            // system.register(email, 'password', username)
+    const generateUser = async () => {
+        if(userDetails.name == '' || userDetails.age == -1 || userDetails.weight == -1 || userDetails.password == '') {
+            console.error('User details are not complete')
+            return
+        }
+        const name = (userDetails.name).replace(' ', '-').toLowerCase()
+        const id = parseInt(await system.getUserNumber(name)) + 1
+        
+        const username = `${name}-${id}`
+        const email = `${username}@gmail.com`
+        userDetails.email = email
+        const password = userDetails.password
+        // console.log(id)
+        const response = await system.register(email, password, username)
+        // console.log(response)
+        if(response) {
+            // console.log('User created')
+            // console.log(username)
+            userDetails.id = id
+            await system.addUserNumber(name)
         }
     }
     
@@ -123,19 +157,26 @@ const Register = () => {
         if (pageText[pageCounter].includes('Is your')){
             setSpeech(pageText[pageCounter] + ' ' + userDetails[pageText[pageCounter].split(' ')[2]])
             openUserInput(userDetails[pageText[pageCounter].split(' ')[2]])
-        } else {
+        } 
+        else if (pageCounter == 14){
+            setSpeech(userDetails.password + ' ' + pageText[pageCounter])
+            openUserInput(userDetails.password)
+        } 
+        else {
             setSpeech(pageText[pageCounter])
             closeUserInput()
         }
 
     }
 
-    const nextPage = () => {
+    const nextPage = async () => {
         if(pageCounter < pageText.length - 1) {
             pageCounter++
             goToPage(pageCounter)
         } else {
-            console.log('ending...')
+            await generateUser()
+            registerDone = true
+            setSpeech(`I've created your account, your username is: ${(userDetails.name).toUpperCase()}-${userDetails.id}. It's your name with a number at the end. I will take you to the home page now`)
         }
     }
 
@@ -162,7 +203,9 @@ const Register = () => {
     }
 
     const handleInput = (e) => {
-        const value = e.target.value + e.key
+        let value = e.target.value
+        if(e.key != 'Enter' && e.key != 'Backspace') value += e.key
+        
         console.log(pageCounter)
         if(pageCounter == 6){
             // name
@@ -185,12 +228,19 @@ const Register = () => {
             },500)
             //age
             userDetails.age = value
+        } else if (pageCounter == 14){
+            clearTimeout(inputTimer)
+            inputTimer = setTimeout(() => {
+                setSpeech(`${value} ${pageText[pageCounter]}`)
+            },500)
+            //password
+            userDetails.password = value
         }
     }
-
     
     const speak = async () => {
         if(isSpeaking) {console.error('NOTE: something is already being said') ; return}
+        console.log(pageCounter)
         console.log (userDetails)
         // functions that run before the speech
         isSpeaking = true
@@ -208,6 +258,15 @@ const Register = () => {
         changeSpeakerBubble(false)
         isSpeaking = false
         turnRecognitionOn()
+
+        // automatically complete this page
+        if (pageCounter == 11 || pageCounter == 12){
+            nextPage()
+        } 
+        if (registerDone){
+            console.log('redirecting to home page')
+            // window.location.pathname = '/'
+        }
         
         // if the user is inactive for 1 minute, remind them that the system is still listening
         clearTimeout(reminder)
@@ -261,15 +320,20 @@ const Register = () => {
                                 break
 
                             case 'yes':
-                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10){
+                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 14){
                                     nextPage()
                                 }
                                 break;
                                 
                             case 'no':
-                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10){
+                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 14){
                                     previousPage()
                                 }
+                                break
+
+                            case 'complete password':
+                                userDetails.password = speech.split('complete password')[0].trim()
+                                goToPage(14)
                                 break
 
                             default:
