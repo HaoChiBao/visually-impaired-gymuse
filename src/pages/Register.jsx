@@ -1,9 +1,8 @@
 import './css/Register.css';
 import { useState, useEffect } from 'react';
-import {  } from 'react-router-dom';
 
 // components
-import SpeakerBubble from '../components/SpeakerBubble';
+import {SpeakerBubble, changeSpeakerBubble, pulseSpeakerBubble} from '../components/SpeakerBubble';
 import SpeechFooter from '../components/SpeechFooter';
 
 // functions
@@ -11,12 +10,12 @@ import System from '../auth/system';
 import generateSpeech from '../functions/generateSpeech';
 import getNumberFromString from '../functions/getNumberFromString';
 
+import recognitionOnSound from '../audio/bellchime.mp3'
+// import recognitionOffSound from '../audio/belloff.mp3'
+import recognitionOffSound from '../audio/popup.mp3'
+
 const system = new System()
 
-const SPEAKER_COLOURS = {
-    on: '#FF5353',
-    off: '#ffd000'
-}
 // system.signOut()
 const pageText = [
     // introduction
@@ -57,23 +56,23 @@ const triggerWords = [
     'complete password', // indicates that the user is done speaking their password sentence
 ]
 
-// const userDetails = {
-//     name: '',
-//     email: '',
-//     age: -1,
-//     weight: -1,
-//     password: '',
-//     id: '',
-// }
-
 const userDetails = {
-    name: 'james',
+    name: '',
     email: '',
-    age: 19,
-    weight: 80,
-    password: 'i like turtles',
-    id: -1,
+    age: -1,
+    weight: -1,
+    password: '',
+    id: '',
 }
+
+// const userDetails = {
+//     name: 'james',
+//     email: '',
+//     age: 19,
+//     weight: 80,
+//     password: 'i like turtles',
+//     id: -1,
+// }
 
 let registerDone = false
 
@@ -98,10 +97,33 @@ const Register = () => {
     const turnRecognitionOn = async () => {
         speechOn = true
         try {
+            changeSpeakerBubble(false, true)
             recognition.start() 
         } catch (error) {
             console.error(error)
         }
+    }
+    
+    const turnRecognitionOff = async () => {
+        speechOn = false
+        try {
+            recognition.stop()
+            // await recognition.abort()// do not use await here because it will block the rest of the code
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const toggleRecognition = () => {
+        const audio = new Audio()
+        if(speechOn) {
+            turnRecognitionOff()
+            audio.src = recognitionOffSound
+        } else {
+            turnRecognitionOn()
+            audio.src = recognitionOnSound
+        }
+        audio.play()
     }
 
     const generateUser = async () => {
@@ -127,16 +149,6 @@ const Register = () => {
             // console.log(username)
             userDetails.id = id
             await system.addUserNumber(name)
-        }
-    }
-    
-    const turnRecognitionOff = async () => {
-        speechOn = false
-        try {
-            recognition.stop()
-            // await recognition.abort()// do not use await here because it will block the rest of the code
-        } catch (error) {
-            console.error(error)
         }
     }
     
@@ -179,7 +191,9 @@ const Register = () => {
         } else {
             await generateUser()
             registerDone = true
-            setSpeech(`I've created your account, your username is: ${(userDetails.name).toUpperCase()}-${userDetails.id}. It's your name with a number at the end. I will take you to the home page now`)
+            const text = `I've created your account, your username is: ${(userDetails.name).toUpperCase()}-${userDetails.id}. It's your name with a number at the end. I will take you to the home page now`
+            setSpeech(text)
+            closeUserInput()
         }
     }
 
@@ -188,21 +202,6 @@ const Register = () => {
             pageCounter--
             goToPage(pageCounter)
         }
-    }
-
-    const changeSpeakerBubble = (isSpeaking = true) => {
-        const bubble = document.querySelector('.speakerBubble')
-        const inner = document.querySelector('.speakerBubble .inner')
-        if (isSpeaking) {        
-            bubble.style.backgroundColor = SPEAKER_COLOURS.on + '5d'
-            inner.style.backgroundColor = SPEAKER_COLOURS.on + 'ff'
-            bubble.style.animation = 'pulse 1s infinite'
-        } else {
-            bubble.style.backgroundColor = SPEAKER_COLOURS.off + '5d'
-            inner.style.backgroundColor = SPEAKER_COLOURS.off + 'ff'
-            bubble.style.animation = ''
-        }
-    
     }
 
     const handleInput = (e) => {
@@ -239,6 +238,11 @@ const Register = () => {
             //password
             userDetails.password = value
         }
+    }
+
+    const handleClick = (e) => {
+        if(isSpeaking) return
+        toggleRecognition()
     }
     
     const speak = async () => {
@@ -286,10 +290,15 @@ const Register = () => {
 
     recognition.onresult = (event) => {
         if(!isSpeaking) {
+
+            // get the transcript
             const last = event.results.length - 1
             let speech = event.results[last][0].transcript
             speech = speech.toLowerCase()
+
             setTranscript(speech)
+            pulseSpeakerBubble()
+
             clearTimeout(timeout)
             timeout = setTimeout(() => {
                 triggerWords.forEach(async (word) => {
@@ -353,6 +362,8 @@ const Register = () => {
         // if (speechOn) {
         //     recognition.start()
         // }
+        speechOn = false
+        changeSpeakerBubble(false, false)
     }
     
     useEffect(() => {
@@ -365,8 +376,8 @@ const Register = () => {
     }, [speech])
 
     return (
-        <div className="Register" onClick={speak}>
-            <div className="top">
+        <div className="Register">
+            <div className="top" onClick={handleClick}>
                 <SpeakerBubble/>
             </div>
             <div className="bottom">
