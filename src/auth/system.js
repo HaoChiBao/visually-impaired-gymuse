@@ -7,9 +7,6 @@ import {initializeApp} from 'firebase/app';
 import {getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword, getUserByEmail} from 'firebase/auth';
 import {getDatabase, ref, set, get, onDisconnect} from 'firebase/database';
 
-// creates random ids
-import {nanoid} from 'https://cdnjs.cloudflare.com/ajax/libs/nanoid/3.3.4/nanoid.min.js'
-
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
     authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -37,8 +34,8 @@ class System {
 
         this.data = {
             username: 'Username',
-            id: nanoid(),
             details: {
+                name: 'unnamed',
                 weight: 0,
                 height: 0,
                 age: 0,

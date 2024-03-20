@@ -146,6 +146,7 @@ const Register = () => {
         userDetails.email = email
         const password = userDetails.password
         // console.log(id)
+        system.data.details = userDetails
         const response = await system.register(email, password, username)
         // console.log(response)
         if(response) {

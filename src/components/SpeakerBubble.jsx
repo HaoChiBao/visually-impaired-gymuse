@@ -13,6 +13,32 @@ const SPEAKER_COLOURS = {
 
 const DEBUG = false
 
+const transformBubble = (original = true) => {
+    const bubble = document.querySelector('.speakerBubble')
+    if(original) {
+        bubble.style.setProperty('--border-radius', '50%')
+        bubble.style.setProperty('--inner-diff', '80px')
+        bubble.style.setProperty('--width', '30vh')
+        bubble.style.setProperty('--height', '30vh')
+    } else {
+        bubble.style.setProperty('--border-radius', '10px')
+        bubble.style.setProperty('--inner-diff', '20px')
+        bubble.style.setProperty('--width', 'calc(100% - 20px)')
+        bubble.style.setProperty('--height', '80px')
+    }
+}
+
+const toggleTransform = () => {
+    const bubble = document.querySelector('.speakerBubble')
+    const height = bubble.style.getPropertyValue('--height')
+    if(height === '30vh') {
+        transformBubble(false)
+    } else {
+        transformBubble(true)
+    }
+}
+
+
 const pulseSpeakerBubble = () => {
     const bubble = document.querySelector('.speakerBubble')
     bubble.style.transform = 'scale(1.1)'
