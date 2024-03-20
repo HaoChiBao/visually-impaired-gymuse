@@ -117,8 +117,9 @@ const Home = () => {
 
   recognition.onend = async () => {     
     console.log('Speech recognition ending...')
-    if(speechOn) changeSpeakerBubble(false, true)
-    else changeSpeakerBubble(false, false)
+    // if(speechOn) changeSpeakerBubble(false, true)
+    // else 
+    changeSpeakerBubble(false, false)
     speechOn = false
   }
 
