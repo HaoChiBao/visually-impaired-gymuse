@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "FitSense",
+  "name": "FitSense: Gymuse for the Visually Impaired",
   "icons": [
     {
       "src": "favicon.ico",
