@@ -10,6 +10,7 @@ import System from '../auth/system';
 import generateSpeech from '../functions/generateSpeech';
 import getNumberFromString from '../functions/getNumberFromString';
 
+// sounds
 import recognitionOnSound from '../audio/bellchime.mp3'
 // import recognitionOffSound from '../audio/belloff.mp3'
 import recognitionOffSound from '../audio/popup.mp3'
@@ -98,6 +99,7 @@ const Register = () => {
         speechOn = true
         try {
             changeSpeakerBubble(false, true)
+            pulseSpeakerBubble()
             recognition.start() 
         } catch (error) {
             console.error(error)
@@ -107,7 +109,9 @@ const Register = () => {
     const turnRecognitionOff = async () => {
         speechOn = false
         try {
+            pulseSpeakerBubble()
             recognition.stop()
+            changeSpeakerBubble(false, false)
             // await recognition.abort()// do not use await here because it will block the rest of the code
         } catch (error) {
             console.error(error)
@@ -251,20 +255,16 @@ const Register = () => {
         console.log (userDetails)
         // functions that run before the speech
         isSpeaking = true
-        changeSpeakerBubble()
         
         const timer = setTimeout(() => {console.log('Speech took too long...')}, 10000)
         
         turnRecognitionOff()
+        changeSpeakerBubble(true)
         await generateSpeech(speech)
         turnRecognitionOn()
+        isSpeaking = false
         
         clearTimeout(timer)
-        
-        // turn off or reset everything after the speech
-        changeSpeakerBubble(false)
-        isSpeaking = false
-        turnRecognitionOn()
 
         // automatically complete this page
         if (pageCounter == 11 || pageCounter == 12){

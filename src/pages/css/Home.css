@@ -1,4 +1,22 @@
-h2 {
+
+.Home {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+  height: 100vh;
+  width: 100vw;
+  
+  background-color: #303030;
+  /* background-color: #262626; */
+  
+  overflow: hidden;
+  
+  position: relative;
+}
+
+.Home p {
   max-width: 70vw;
   z-index: 1;
 
@@ -9,6 +27,7 @@ h2 {
   border-radius: 10px;
 
   font-size: 2rem;
+  font-weight: bold;
 
   pointer-events: none;
   
@@ -19,80 +38,23 @@ h2 {
   user-select: none; /* Standard syntax */
 }
 
-.Home {
+
+.Home .top {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  height: 100vh;
-  width: 100vw;
   
-  background-color: #303030;
-  /* background-color: #262626; */
-
-  overflow: hidden;
-
-  position: relative;
+  width: 100%;
+  height: 50%;
 }
 
-.microphone{
-  width: 500px;
-  aspect-ratio: 1/1;
-  
+.Home .bottom {
+  /* padding-top: 20px; */
   display: flex;
-  justify-content: center;
-  align-items: center;
-
-  background-color: #d9d9d95d;
-
-  border-radius: 50%;
-  transition: 0.3s ease;
-  
-  position: absolute;
-
-  pointer-events: none;
-
-  /* overflow: hidden; */
-
-  transform: translate(-50%, -50%);
-}
-
-.microphone * {
-  -webkit-user-select: none; /* Safari */
-  -moz-user-select: none; /* Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Standard syntax */
-}
-
-.microphone .inner{
-  width: 80%;
-  height: 80%;
-  background-color: #d9d9d9ff;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
   
-  position: absolute;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-
-  /* transition: 0.05s ease; */
-}
-
-.microphone .inner img{
-  width: 20%;
-  aspect-ratio: 1/1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-  position: absolute;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  left: 50%;
-
-  /* transition: 0.05s ease; */
+  width: 100%;
+  height: 50%;
 }
