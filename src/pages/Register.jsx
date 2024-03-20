@@ -263,7 +263,7 @@ const Register = () => {
         await generateSpeech(speech)
         turnRecognitionOn()
         isSpeaking = false
-        
+
         clearTimeout(timer)
 
         // automatically complete this page
@@ -272,7 +272,7 @@ const Register = () => {
         } 
         if (registerDone){
             console.log('redirecting to home page')
-            // window.location.pathname = '/'
+            window.location.pathname = '/'
         }
         
         // if the user is inactive for 1 minute, remind them that the system is still listening
@@ -359,11 +359,9 @@ const Register = () => {
 
     recognition.onend = () => {
         console.log('Speech recognition ending...')
-        // if (speechOn) {
-        //     recognition.start()
-        // }
+        if(speechOn) changeSpeakerBubble(false, true)
+        else changeSpeakerBubble(false, false)
         speechOn = false
-        changeSpeakerBubble(false, false)
     }
     
     useEffect(() => {

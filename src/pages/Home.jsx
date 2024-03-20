@@ -135,6 +135,7 @@ const Home = () => {
   }
 
   const handleClick = async () => {
+    console.log(system.user)
     toggleRecognition()
   }
 
