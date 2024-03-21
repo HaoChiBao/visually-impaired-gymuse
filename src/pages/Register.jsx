@@ -57,23 +57,23 @@ const triggerWords = [
     'complete password', // indicates that the user is done speaking their password sentence
 ]
 
-const userDetails = {
-    name: '',
-    email: '',
-    age: -1,
-    weight: -1,
-    password: '',
-    id: '',
-}
-
 // const userDetails = {
-//     name: 'james',
+//     name: '',
 //     email: '',
-//     age: 19,
-//     weight: 80,
-//     password: 'i like turtles',
-//     id: -1,
+//     age: -1,
+//     weight: -1,
+//     password: '',
+//     id: '',
 // }
+
+const userDetails = {
+    name: 'james',
+    email: '',
+    age: 19,
+    weight: 80,
+    password: 'i like turtles',
+    id: -1,
+}
 
 let registerDone = false
 
@@ -146,14 +146,16 @@ const Register = () => {
         userDetails.email = email
         const password = userDetails.password
         // console.log(id)
-        system.data.details = userDetails
+        
         const response = await system.register(email, password, username)
-        // console.log(response)
+    
         if(response) {
-            // console.log('User created')
-            // console.log(username)
             userDetails.id = id
             await system.addUserNumber(name)
+
+            console.log(response)
+            system.data.details = userDetails
+            await system.setData(system.userRef, system.data)
         }
     }
     
@@ -273,7 +275,7 @@ const Register = () => {
         } 
         if (registerDone){
             console.log('redirecting to home page')
-            window.location.pathname = '/'
+            // window.location.pathname = '/'
         }
         
         // if the user is inactive for 1 minute, remind them that the system is still listening
@@ -359,9 +361,25 @@ const Register = () => {
     }
 
     recognition.onend = () => {
-        console.log('Speech recognition ending...')
-        // if(speechOn) changeSpeakerBubble(false, true)
-        // else 
+        // Check if getUserMedia is available
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Request access to the microphone
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    console.log('Microphone is on.');
+                    changeSpeakerBubble(false, true)
+                    return
+
+                    // stream.getTracks().forEach(track => track.stop());
+                })
+                .catch(function(error) {
+                    console.error('Error accessing microphone:', error);
+
+                });
+        } else {
+            console.error('getUserMedia is not supported in this browser.');
+            // Handle the case where getUserMedia is not supported
+        }
         changeSpeakerBubble(false, false)
         speechOn = false
     }

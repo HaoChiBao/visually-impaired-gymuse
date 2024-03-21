@@ -64,7 +64,7 @@ class System {
                     console.log(user)
                 } else {
                     console.log("creating user data");
-
+                    console.log(this.data)
                     this.setData(this.userRef, this.data)
                 }
             })
@@ -99,7 +99,7 @@ class System {
             .then((userCredential) => {
                 const user = userCredential.user;
                 console.log(user)
-                resolve(true);
+                resolve(user);
             })
             .catch((error) => {
                 let errorCode = error.code;
