@@ -33,6 +33,8 @@ const pageText = [
     'Is your weight',
     'What is your age? Say "MY AGE IS", and then followed by your age',
     'Is your age',
+    'What is your approximate height in centimeters? Say "MY HEIGHT IS", and then followed by your height',
+    'Is your height',
 
     'Perfect! Please think of a sentence I will use it as your password', //this page automatically goes to the next
     'Use sentences like "I really enjoy going to the gym," so that it is easy to remember', // this page automatically goes to the next
@@ -50,6 +52,7 @@ const triggerWords = [
     'my name is',
     'my weight is',
     'my age is',
+    'my height is',
 
     'yes', // confirm the information
     'no', // deny the information
@@ -57,23 +60,27 @@ const triggerWords = [
     'complete password', // indicates that the user is done speaking their password sentence
 ]
 
-// const userDetails = {
-//     name: '',
-//     email: '',
-//     age: -1,
-//     weight: -1,
-//     password: '',
-//     id: '',
-// }
-
 const userDetails = {
-    name: 'james',
+    name: '',
     email: '',
-    age: 19,
-    weight: 80,
-    password: 'i like turtles',
-    id: -1,
+    age: -1,
+    weight: -1,
+    password: '',
+    id: '',
+    height: -1,
+    BMI: -1,
 }
+
+// const userDetails = {
+//     name: 'james',
+//     email: '',
+//     age: 19,
+//     weight: 80,
+//     password: 'i like turtles',
+//     height: 180,
+//     BMI: 0,
+//     id: -1,
+// }
 
 let registerDone = false
 
@@ -132,10 +139,12 @@ const Register = () => {
 
     const generateUser = async () => {
         console.log('Generating user...')
-        if(userDetails.name == '' || userDetails.age == -1 || userDetails.weight == -1 || userDetails.password == '') {
+        if(userDetails.name == '' || userDetails.age == -1 || userDetails.weight == -1 || userDetails.password == '' || userDetails.height == -1) {
             console.error('User details are not complete')
             return
         }
+        userDetails.BMI = Math.round(userDetails.weight / ((userDetails.height / 100) ** 2))
+
         const name = (userDetails.name).replace(' ', '-').toLowerCase()
         let id = await system.getUserNumber(name)
         if(id == -1) { console.error('Error getting user number') ; return}
@@ -180,7 +189,7 @@ const Register = () => {
             setSpeech(pageText[pageCounter] + ' ' + userDetails[pageText[pageCounter].split(' ')[2]])
             openUserInput(userDetails[pageText[pageCounter].split(' ')[2]])
         } 
-        else if (pageCounter == 14){
+        else if (pageCounter == 16){
             setSpeech(userDetails.password + ' ' + pageText[pageCounter])
             openUserInput(userDetails.password)
         } 
@@ -237,7 +246,15 @@ const Register = () => {
             },500)
             //age
             userDetails.age = value
-        } else if (pageCounter == 14){
+        
+        } else if (pageCounter == 12) {
+            clearTimeout(inputTimer)
+            inputTimer = setTimeout(() => {
+                setSpeech(`Is your height ${value}?`)
+            },500)
+            //height
+            userDetails.height = value
+        } else if (pageCounter == 16){
             clearTimeout(inputTimer)
             inputTimer = setTimeout(() => {
                 setSpeech(`${value} ${pageText[pageCounter]}`)
@@ -270,7 +287,7 @@ const Register = () => {
         clearTimeout(timer)
 
         // automatically complete this page
-        if (pageCounter == 11 || pageCounter == 12){
+        if (pageCounter == 13 || pageCounter == 14){
             nextPage()
         } 
         if (registerDone){
@@ -293,6 +310,7 @@ const Register = () => {
 
     recognition.onresult = (event) => {
         if(!isSpeaking) {
+            changeSpeakerBubble(false, true)
 
             // get the transcript
             const last = event.results.length - 1
@@ -334,21 +352,27 @@ const Register = () => {
                                 goToPage(10)
                                 break
 
+                            case 'my height is':
+                                const height = getNumberFromString(speech)[0]
+                                userDetails.height = height
+                                goToPage(12)
+                                break
+
                             case 'yes':
-                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 14){
+                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 12 || pageCounter == 16){
                                     nextPage()
                                 }
                                 break;
                                 
                             case 'no':
-                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 14){
+                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 12 || pageCounter == 16){
                                     previousPage()
                                 }
                                 break
 
                             case 'complete password':
                                 userDetails.password = speech.split('complete password')[0].trim()
-                                goToPage(14)
+                                goToPage(16)
                                 break
 
                             default:
@@ -360,26 +384,14 @@ const Register = () => {
         }
     }
 
+    recognition.onstart = () => {
+        console.log('Speech recognition starting...')
+        changeSpeakerBubble(false, true)
+        speechOn = true
+    }
+
     recognition.onend = () => {
-        // Check if getUserMedia is available
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            // Request access to the microphone
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(function(stream) {
-                    console.log('Microphone is on.');
-                    changeSpeakerBubble(false, true)
-                    return
-
-                    // stream.getTracks().forEach(track => track.stop());
-                })
-                .catch(function(error) {
-                    console.error('Error accessing microphone:', error);
-
-                });
-        } else {
-            console.error('getUserMedia is not supported in this browser.');
-            // Handle the case where getUserMedia is not supported
-        }
+        console.log('Speech recognition ending...')
         changeSpeakerBubble(false, false)
         speechOn = false
     }

@@ -33,6 +33,7 @@ class System {
         this.uid = null;
 
         this.data = {
+            DEFAULT: true,
             username: 'Username',
             details: {
                 name: 'unnamed',
@@ -60,7 +61,8 @@ class System {
             // get user data
             get(this.userRef).then((snapshot) => {
                 if (snapshot.exists()) {
-                    const user = snapshot.val();
+                    const userData = snapshot.val();
+                    this.data = userData;
                     console.log(user)
                 } else {
                     console.log("creating user data");

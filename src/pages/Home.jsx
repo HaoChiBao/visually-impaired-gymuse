@@ -26,6 +26,8 @@ const contentAdd = '\n Keep the response length short and but keep content integ
 
 const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCase()}" in your response.`
 
+let loadUserData = false // check if user data has been loaded into the chathistory
+
 let chatHistory = [
   {
     role: 'system',
@@ -90,6 +92,7 @@ const Home = () => {
     const transcript = result[0].transcript;
     // console.log(transcript)
 
+    changeSpeakerBubble(false, true)
     setTranscript(transcript)
     pulseSpeakerBubble()
     
@@ -99,6 +102,14 @@ const Home = () => {
 
       if (transcript.toLowerCase().includes(keyword.toLowerCase())){
         
+        // check if user is logged in
+        if(system.user && !loadUserData){
+          const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
+          chatHistory.push({role: 'system', content: promptUserData})
+          console.log(promptUserData)
+          loadUserData = true
+        }
+
         // add user input to chat history
         chatHistory.push({role: 'user', content: transcript + contentAdd})
         const [response, copyChatHistory] = await generateResponse(chatHistory)
@@ -116,6 +127,12 @@ const Home = () => {
 
     }, 500)
   }
+
+  recognition.onstart = () => {
+    console.log('Speech recognition starting...')
+    changeSpeakerBubble(false, true)
+    speechOn = true
+}
 
   recognition.onend = async () => {     
     console.log('Speech recognition ending...')
@@ -138,7 +155,6 @@ const Home = () => {
   }
 
   const handleClick = async () => {
-    console.log(system.user)
     toggleRecognition()
   }
 
