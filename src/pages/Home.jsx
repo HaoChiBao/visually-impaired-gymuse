@@ -47,7 +47,7 @@ const Home = () => {
   // console.log(await generateResponse())
   
   let recognition = new window.webkitSpeechRecognition;
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = "en-US";
 
@@ -94,13 +94,14 @@ const Home = () => {
     const transcript = result[0].transcript;
     const final = result.isFinal
 
-    // console.log(final)
+    console.log(final)
 
     changeSpeakerBubble(false, true)
     setTranscript(transcript)
     pulseSpeakerBubble()
     
     if(final && !isSpeaking && !inResult){
+      console.log(transcript)
       if (transcript.toLowerCase().includes(keyword.toLowerCase())){
         inResult = true
 
@@ -152,12 +153,12 @@ const Home = () => {
     
     const response = await generateSpeech(speech)
     
+    const test = document.querySelector('.test')
+    test.innerHTML = response
     if(response){
       turnRecognitionOn()
     } else {
       console.log('error')
-      const test = document.querySelector('.test')
-      test.innerHTML = response
       // turnRecognitionOff()
     }
     

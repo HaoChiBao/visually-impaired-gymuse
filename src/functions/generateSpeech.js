@@ -43,7 +43,7 @@ const generateSpeech = async (transcript) => {
 
       audio.src = `data:audio/wav;base64,${audioContent}`;
 
-      await audio.load()
+      audio.load()
       await audio.play();
 
       audio.onended = () => {
