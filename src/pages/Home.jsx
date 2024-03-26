@@ -121,7 +121,7 @@ const Home = () => {
         setSpeech(response)
 
       } else {
-        setSpeech(retryPhrase)
+        // setSpeech(retryPhrase)
       }
     }
   }
