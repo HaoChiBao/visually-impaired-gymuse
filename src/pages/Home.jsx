@@ -152,11 +152,12 @@ const Home = () => {
     changeSpeakerBubble()
     
     const response = await generateSpeech(speech)
-
+    
     if(response){
       turnRecognitionOn()
     } else {
       console.log('error')
+      turnRecognitionOff()
     }
     
     isSpeaking = false
