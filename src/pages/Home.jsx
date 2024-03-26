@@ -47,7 +47,7 @@ const Home = () => {
   // console.log(await generateResponse())
   
   let recognition = new window.webkitSpeechRecognition;
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.interimResults = true;
   recognition.lang = "en-US";
 
