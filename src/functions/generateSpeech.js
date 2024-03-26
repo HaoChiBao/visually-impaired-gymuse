@@ -52,7 +52,7 @@ const generateSpeech = async (transcript) => {
 
     } catch (err) {
       console.error('Error generating speech:', err.message || err);
-      resolve(false)
+      resolve(err)
     }
 
   })

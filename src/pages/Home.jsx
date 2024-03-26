@@ -156,7 +156,9 @@ const Home = () => {
       turnRecognitionOn()
     } else {
       console.log('error')
-      // turnRecognitionOff()
+      const test = document.querySelector('.test')
+      test.innerHTML = response
+      turnRecognitionOff()
     }
     
     isSpeaking = false
@@ -172,9 +174,10 @@ const Home = () => {
 
   return (
     <div className = 'Home'>
-        <button className="top" onClick={handleClick}>
-            <SpeakerBubble/>
-        </button>
+      <button className="top" onClick={handleClick}>
+          <SpeakerBubble/>
+      </button>
+      <div className="test">test</div>
       <div className="bottom">
           <p>{speech}</p>
       </div>
