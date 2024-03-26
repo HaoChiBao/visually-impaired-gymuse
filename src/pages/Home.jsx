@@ -131,7 +131,7 @@ const Home = () => {
           setSpeech(retryPhrase)
         }
   
-      }, 300)
+      }, 450)
     }
   }
 
