@@ -99,8 +99,6 @@ const Home = () => {
     pulseSpeakerBubble()
     
     if(final && !isSpeaking){
-      turnRecognitionOff()
-      changeSpeakerBubble()
       if (transcript.toLowerCase().includes(keyword.toLowerCase())){
         
         // check if user is logged in
@@ -123,7 +121,7 @@ const Home = () => {
         setSpeech(response)
 
       } else {
-        // setSpeech(retryPhrase)
+        setSpeech(retryPhrase)
       }
     }
   }
