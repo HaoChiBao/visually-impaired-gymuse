@@ -39,18 +39,18 @@ let chatHistory = [
   },
 ]
 
+let recognition = new window.webkitSpeechRecognition;
+recognition.continuous = true;
+recognition.interimResults = true;
+recognition.lang = "en-US";
+
 const Home = () => {
   const [speech, setSpeech] = useState('Press to talk...')
   const [transcript, setTranscript] = useState('what you say appears here...')
   
 
   // console.log(await generateResponse())
-  console.log(new webkitSpeechRecognition)
-  // let recognition = new window.webkitSpeechRecognition;
-  let recognition = new webkitSpeechRecognition;
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = "en-US";
+  // console.log(new webkitSpeechRecognition)
 
   // const button = document.querySelector('button')
 
