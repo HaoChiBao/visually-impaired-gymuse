@@ -87,45 +87,47 @@ const Home = () => {
 
   let timeout = null
   recognition.onresult = function (event) {
-    if(isSpeaking) return
-    const result = event.results[event.results.length - 1];
-    const transcript = result[0].transcript;
-    // console.log(transcript)
+    if(!isSpeaking){
 
-    changeSpeakerBubble(false, true)
-    setTranscript(transcript)
-    pulseSpeakerBubble()
-    
-    clearTimeout(timeout)
-    timeout = setTimeout(async () => {
-      console.log(transcript)
-
-      if (transcript.toLowerCase().includes(keyword.toLowerCase())){
-        
-        // check if user is logged in
-        if(system.user && !loadUserData){
-          const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
-          chatHistory.push({role: 'system', content: promptUserData})
-          console.log(promptUserData)
-          loadUserData = true
+      const result = event.results[event.results.length - 1];
+      const transcript = result[0].transcript;
+      // console.log(transcript)
+  
+      changeSpeakerBubble(false, true)
+      setTranscript(transcript)
+      pulseSpeakerBubble()
+      
+      clearTimeout(timeout)
+      timeout = setTimeout(async () => {
+        console.log(transcript)
+  
+        if (transcript.toLowerCase().includes(keyword.toLowerCase())){
+          
+          // check if user is logged in
+          if(system.user && !loadUserData){
+            const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
+            chatHistory.push({role: 'system', content: promptUserData})
+            console.log(promptUserData)
+            loadUserData = true
+          }
+  
+          // add user input to chat history
+          chatHistory.push({role: 'user', content: transcript + contentAdd})
+          const [response, copyChatHistory] = await generateResponse(chatHistory)
+          // console.log(response)
+          
+          // update chat history with response
+          chatHistory = copyChatHistory
+          console.log(chatHistory)
+  
+          setSpeech(response)
+  
+        } else {
+          setSpeech(retryPhrase)
         }
-
-        // add user input to chat history
-        chatHistory.push({role: 'user', content: transcript + contentAdd})
-        const [response, copyChatHistory] = await generateResponse(chatHistory)
-        // console.log(response)
-        
-        // update chat history with response
-        chatHistory = copyChatHistory
-        console.log(chatHistory)
-
-        setSpeech(response)
-
-      } else {
-        setSpeech(retryPhrase)
-      }
-
-    }, 500)
+  
+      }, 500)
+    }
   }
 
   recognition.onstart = () => {
@@ -164,9 +166,9 @@ const Home = () => {
 
   return (
     <div className = 'Home'>
-        <div className="top" onClick={handleClick}>
+        <button className="top" onClick={handleClick}>
             <SpeakerBubble/>
-        </div>
+        </button>
       <div className="bottom">
           <p>{speech}</p>
       </div>
