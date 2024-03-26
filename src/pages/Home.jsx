@@ -103,9 +103,10 @@ const Home = () => {
       
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
-
+        console.log(0)
         if(!isInTimeout){
           isInTimeout = true
+          turnRecognitionOff()
           console.log(transcript)
     
           if (transcript.toLowerCase().includes(keyword.toLowerCase())){
@@ -139,7 +140,7 @@ const Home = () => {
           console.error('Already forming response!')
         }
   
-      }, 500)
+      }, 700)
     }
   }
 
