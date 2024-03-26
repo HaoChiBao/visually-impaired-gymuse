@@ -156,7 +156,7 @@ const Home = () => {
       turnRecognitionOn()
     } else {
       console.log('error')
-      turnRecognitionOff()
+      // turnRecognitionOff()
     }
     
     isSpeaking = false
