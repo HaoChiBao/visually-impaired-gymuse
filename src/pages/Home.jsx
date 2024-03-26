@@ -158,7 +158,7 @@ const Home = () => {
       console.log('error')
       const test = document.querySelector('.test')
       test.innerHTML = response
-      turnRecognitionOff()
+      // turnRecognitionOff()
     }
     
     isSpeaking = false
