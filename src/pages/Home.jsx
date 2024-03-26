@@ -22,9 +22,6 @@ const system = new System()
 let speechOn = false
 let isSpeaking = false
 
-let timeout = null // timeout interval for speech recognition
-let isInTimeout = false
-
 const keyword = 'bro'
 const contentAdd = '\n Keep the response length short and but keep content integrity.'
 
@@ -49,7 +46,7 @@ const Home = () => {
   
   let recognition = new window.webkitSpeechRecognition;
   recognition.continuous = true;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.lang = "en-US";
 
   // const button = document.querySelector('button')
@@ -95,43 +92,40 @@ const Home = () => {
 
       const result = event.results[event.results.length - 1];
       const transcript = result[0].transcript;
-      // console.log(transcript)
-  
+      const final = result.isFinal
+
+      console.log(final)
+
       changeSpeakerBubble(false, true)
       setTranscript(transcript)
       pulseSpeakerBubble()
       
-      if (transcript.toLowerCase().includes(keyword.toLowerCase())){
-        
-        // check if user is logged in
-        if(system.user && !loadUserData){
-          const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
-          chatHistory.push({role: 'system', content: promptUserData})
-          console.log(promptUserData)
-          loadUserData = true
+      if(final){
+        if (transcript.toLowerCase().includes(keyword.toLowerCase())){
+          
+          // check if user is logged in
+          if(system.user && !loadUserData){
+            const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
+            chatHistory.push({role: 'system', content: promptUserData})
+            console.log(promptUserData)
+            loadUserData = true
+          }
+  
+          // add user input to chat history
+          chatHistory.push({role: 'user', content: transcript + contentAdd})
+          const [response, copyChatHistory] = await generateResponse(chatHistory)
+          // console.log(response)
+          
+          // update chat history with response
+          chatHistory = copyChatHistory
+          console.log(chatHistory)
+  
+          setSpeech(response)
+  
+        } else {
+          setSpeech(retryPhrase)
         }
-
-        // add user input to chat history
-        chatHistory.push({role: 'user', content: transcript + contentAdd})
-        const [response, copyChatHistory] = await generateResponse(chatHistory)
-        // console.log(response)
-        
-        // update chat history with response
-        chatHistory = copyChatHistory
-        console.log(chatHistory)
-
-        setSpeech(response)
-
-      } else {
-        setSpeech(retryPhrase)
       }
-      clearTimeout(timeout)
-      timeout = setTimeout(async () => {
-        // turnRecognitionOff()
-        // console.log(transcript)
-  
-  
-      }, 450)
     }
   }
 
