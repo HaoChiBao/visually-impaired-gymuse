@@ -25,6 +25,8 @@ let isSpeaking = false
 const keyword = 'bro'
 const contentAdd = '\n Keep the response length short and but keep content integrity.'
 
+const inResult = false;
+
 const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCase()}" in your response.`
 
 let loadUserData = false // check if user data has been loaded into the chathistory
@@ -98,9 +100,10 @@ const Home = () => {
     setTranscript(transcript)
     pulseSpeakerBubble()
     
-    if(final && !isSpeaking){
+    if(final && !isSpeaking && !inResult){
       if (transcript.toLowerCase().includes(keyword.toLowerCase())){
-        
+        inResult = true
+
         // check if user is logged in
         if(system.user && !loadUserData){
           const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
@@ -120,6 +123,7 @@ const Home = () => {
 
         setSpeech(response)
 
+        inResult = false
       } else {
         // setSpeech(retryPhrase)
       }
