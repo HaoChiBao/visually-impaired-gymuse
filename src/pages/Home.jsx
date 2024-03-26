@@ -103,8 +103,8 @@ const Home = () => {
       
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
-        turnRecognitionOff()
-        console.log(transcript)
+        // turnRecognitionOff()
+        // console.log(transcript)
   
         if (transcript.toLowerCase().includes(keyword.toLowerCase())){
           
