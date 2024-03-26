@@ -73,16 +73,17 @@ const Home = () => {
       }
   }
 
+  const audio = new Audio()
   const toggleRecognition = () => {
-      const audio = new Audio()
-      if(speechOn) {
-          turnRecognitionOff()
-          audio.src = recognitionOffSound
-      } else {
-          turnRecognitionOn()
-          audio.src = recognitionOnSound
-      }
-      audio.play()
+    audio.pause()
+    if(speechOn) {
+        turnRecognitionOff()
+        audio.src = recognitionOffSound
+    } else {
+        turnRecognitionOn()
+        audio.src = recognitionOnSound
+    }
+    audio.play()
   }
 
   let timeout = null
@@ -150,9 +151,14 @@ const Home = () => {
     turnRecognitionOff()
     changeSpeakerBubble()
     
-    await generateSpeech(speech)
+    const response = await generateSpeech(speech)
+
+    if(response){
+      turnRecognitionOn()
+    } else {
+      console.log('error')
+    }
     
-    turnRecognitionOn()
     isSpeaking = false
   }
 

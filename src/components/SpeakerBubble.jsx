@@ -38,7 +38,6 @@ const toggleTransform = () => {
     }
 }
 
-
 const pulseSpeakerBubble = () => {
     const bubble = document.querySelector('.speakerBubble')
     bubble.style.transform = 'scale(1.1)'

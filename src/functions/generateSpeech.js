@@ -47,12 +47,12 @@ const generateSpeech = async (transcript) => {
       await audio.play();
 
       audio.onended = () => {
-        resolve()
+        resolve(true)
       }
 
     } catch (err) {
       console.error('Error generating speech:', err.message || err);
-      resolve()
+      resolve(false)
     }
 
   })
