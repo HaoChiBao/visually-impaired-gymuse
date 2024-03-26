@@ -280,7 +280,11 @@ const Register = () => {
         
         turnRecognitionOff()
         changeSpeakerBubble(true)
-        await generateSpeech(speech)
+        
+        const response = await generateSpeech(speech)
+        
+        if(!response){turnRecognitionOff(); return}
+
         turnRecognitionOn()
         isSpeaking = false
 

@@ -21,6 +21,9 @@ const system = new System()
 
 let speechOn = false
 let isSpeaking = false
+
+let timeout = null // timeout interval for speech recognition
+
 const keyword = 'bro'
 const contentAdd = '\n Keep the response length short and but keep content integrity.'
 
@@ -86,7 +89,6 @@ const Home = () => {
     audio.play()
   }
 
-  let timeout = null
   recognition.onresult = function (event) {
     if(!isSpeaking){
 
