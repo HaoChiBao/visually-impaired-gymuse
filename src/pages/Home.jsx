@@ -103,41 +103,32 @@ const Home = () => {
       
       clearTimeout(timeout)
       timeout = setTimeout(async () => {
-        console.log(0)
-        if(!isInTimeout){
-          isInTimeout = true
-          turnRecognitionOff()
-          console.log(transcript)
-    
-          if (transcript.toLowerCase().includes(keyword.toLowerCase())){
-            
-            // check if user is logged in
-            if(system.user && !loadUserData){
-              const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
-              chatHistory.push({role: 'system', content: promptUserData})
-              console.log(promptUserData)
-              loadUserData = true
-            }
-    
-            // add user input to chat history
-            chatHistory.push({role: 'user', content: transcript + contentAdd})
-            const [response, copyChatHistory] = await generateResponse(chatHistory)
-            // console.log(response)
-            
-            // update chat history with response
-            chatHistory = copyChatHistory
-            console.log(chatHistory)
-    
-            setSpeech(response)
-    
-          } else {
-            setSpeech(retryPhrase)
+        turnRecognitionOff()
+        console.log(transcript)
+  
+        if (transcript.toLowerCase().includes(keyword.toLowerCase())){
+          
+          // check if user is logged in
+          if(system.user && !loadUserData){
+            const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
+            chatHistory.push({role: 'system', content: promptUserData})
+            console.log(promptUserData)
+            loadUserData = true
           }
-
-          isInTimeout = false
-
+  
+          // add user input to chat history
+          chatHistory.push({role: 'user', content: transcript + contentAdd})
+          const [response, copyChatHistory] = await generateResponse(chatHistory)
+          // console.log(response)
+          
+          // update chat history with response
+          chatHistory = copyChatHistory
+          console.log(chatHistory)
+  
+          setSpeech(response)
+  
         } else {
-          console.error('Already forming response!')
+          setSpeech(retryPhrase)
         }
   
       }, 700)
