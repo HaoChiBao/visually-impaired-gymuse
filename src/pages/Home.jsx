@@ -45,8 +45,9 @@ const Home = () => {
   
 
   // console.log(await generateResponse())
-  
-  let recognition = new window.webkitSpeechRecognition;
+  console.log(new webkitSpeechRecognition)
+  // let recognition = new window.webkitSpeechRecognition;
+  let recognition = new webkitSpeechRecognition;
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = "en-US";
@@ -159,7 +160,7 @@ const Home = () => {
       turnRecognitionOn()
     } else {
       console.log('error')
-      // turnRecognitionOff()
+      turnRecognitionOff()
     }
     
     isSpeaking = false
