@@ -25,7 +25,7 @@ let isSpeaking = false
 const keyword = 'bro'
 const contentAdd = '\n Keep the response length short and but keep content integrity.'
 
-const inResult = false;
+let inResult = false;
 
 const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCase()}" in your response.`
 
