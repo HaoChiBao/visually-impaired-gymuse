@@ -72,8 +72,16 @@ const changeSpeakerBubble = (isSpeaking = true, isListening = false) => {
     }
 }
 
-const SpeakerBubble = () => {
-    useEffect(() => {changeSpeakerBubble(false, false)},[])
+const SpeakerBubble = ({state}) => {
+    useEffect(() => {
+        if(state == 0){
+            changeSpeakerBubble(false, false)
+        } else if ( state == 1){
+            changeSpeakerBubble(false, true)
+        } else {
+            changeSpeakerBubble(true, false)
+        }
+    },[state])
     return (
         <div className="speakerBubble">
             <div className="inner">

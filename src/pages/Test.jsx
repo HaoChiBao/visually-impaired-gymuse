@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
+import SpeechFooter from '../components/SpeechFooter';
+import { SpeakerBubble, changeSpeakerBubble, pulseSpeakerBubble } from '../components/SpeakerBubble';
+
 import generateResponse from '../functions/generateResponse';
 import generateSpeech from '../functions/generateSpeech';
 
+import './css/Test.css'
 
 let chatHistory = [
   {
@@ -14,25 +18,33 @@ let chatHistory = [
 ]
 const contentAdd = '\n Keep the response length short and but keep content integrity.'
 
-
+const keyword = 'bro'
+const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCase()}" in your response.`
 
 const Test = () => {
-  const [transcript, setTranscript] = useState('');
-  const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
-  const [count, setCount] = useState(0)
+  const [transcript, setTranscript] = useState(''); // stores the text generated from STT
+  const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
 
-  // useEffect hook to save transcript automatically
+  const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
+
+  // executes when the final result occurs
   useEffect(() => {
     if (finalTranscript !== '') {
-      saveTranscript(finalTranscript);
+      onFinalTranscript(finalTranscript);
       resetTranscript(); // Reset transcript after saving
     }
   }, [finalTranscript, resetTranscript]);
 
-  useEffect(()=>{console.log(interimTranscript)},[interimTranscript])
+  useEffect(()=>{
+    if(interimTranscript != ''){
+      setTranscript(interimTranscript)
+      pulseSpeakerBubble()
+    }
+  },[interimTranscript])
 
-  const saveTranscript = async (transcript) => {
-    console.log('Transcript saved:', transcript);
+  // 
+  const onFinalTranscript = async (transcript) => {
+    console.log('Final result:', transcript);
     setTranscript(transcript);
 
     if((transcript.toLowerCase()).includes('bro')){
@@ -41,37 +53,50 @@ const Test = () => {
       chatHistory = copyChatHistory
       console.log(chatHistory)
       console.log(response)
+      speak(response)
 
-      await generateSpeech(response)
+    } else {
+
     }
   };
 
   const startListening = async () => {
+    setSpeakerState(1)
     await SpeechRecognition.startListening({ continuous: true });
   };
   
   const stopListening = async () => {
+    setSpeakerState(0)
     await SpeechRecognition.stopListening();
   };
   
   const toggleListening = async () => {
-    setCount(count+1)
     if(listening){await stopListening()}
     else await startListening()
     console.log(listening)
   }
 
+  const speak = async (text) => {
+    await stopListening()
+    setSpeakerState(2)
+    await generateSpeech(text)
+    await startListening()
+  }
+
   return (
-    <div>
-      <h1>Voice Transcription</h1>
-      <button onClick={toggleListening}>Toggle Listening</button>
-      <div>
+    <section>
+
+      <button className = 'top' onClick={toggleListening}>
+        <SpeakerBubble state = {speakerState}/>
+      </button>
+
+      <div className = 'bottom'>
+        {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
         <p>Final Result: {transcript}</p>
-        <p>Interim: {interimTranscript}</p>
-        <div>{count}</div>
-        <div>{listening ? <p>T</p> : <p>F</p>}</div>
       </div>
-    </div>
+
+      <SpeechFooter speech = {transcript}/>
+    </section>
   );
 };
 
