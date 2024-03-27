@@ -63,7 +63,8 @@ const Test = () => {
       <h1>Voice Transcription</h1>
       <button onClick={toggleListening}>Toggle Listening</button>
       <div>
-        <p>Transcription: {transcript}</p>
+        <p>Final Result: {transcript}</p>
+        <p>Interim: {interimTranscript}</p>
       </div>
     </div>
   );
