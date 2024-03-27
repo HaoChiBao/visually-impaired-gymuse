@@ -92,6 +92,8 @@ const Test = () => {
     setSpeakerState(2)
     const response = await generateSpeech(text)
     console.log(response)
+    const kys = document.querySelector('.kys')
+    kys.innerHTML = response
     await startListening()
     setIsSpeaking(false)
   }
@@ -102,6 +104,8 @@ const Test = () => {
       <button className = 'top' onClick={toggleListening}>
         <SpeakerBubble state = {speakerState}/>
       </button>
+
+      <div className="kys">hi</div>
 
       <div className = 'bottom'>
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
