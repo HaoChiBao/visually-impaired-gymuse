@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@google-cloud/speech": "^6.3.0",
     "@google-cloud/text-to-speech": "^5.1.0",
     "@speechly/react-client": "^2.2.4",
     "@testing-library/jest-dom": "^5.17.0",
