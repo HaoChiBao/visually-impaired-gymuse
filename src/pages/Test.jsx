@@ -68,6 +68,7 @@ const Test = () => {
         <p>Final Result: {transcript}</p>
         <p>Interim: {interimTranscript}</p>
         <div>{count}</div>
+        <div>{listening}</div>
       </div>
     </div>
   );
