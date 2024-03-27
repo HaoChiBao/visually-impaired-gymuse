@@ -19,6 +19,7 @@ const contentAdd = '\n Keep the response length short and but keep content integ
 const Test = () => {
   const [transcript, setTranscript] = useState('');
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
+  const [count, setCount] = useState(0)
 
   // useEffect hook to save transcript automatically
   useEffect(() => {
@@ -54,6 +55,7 @@ const Test = () => {
   };
 
   const toggleListening = () => {
+    setCount(count+1)
     if(listening){stopListening()}
     else startListening()
   }
@@ -65,6 +67,7 @@ const Test = () => {
       <div>
         <p>Final Result: {transcript}</p>
         <p>Interim: {interimTranscript}</p>
+        <div>{count}</div>
       </div>
     </div>
   );
