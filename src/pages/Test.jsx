@@ -85,8 +85,26 @@ const Test = () => {
     else await startListening()
   }
 
+  const requestAudioPermission = async () => {
+    return new Promise((resolve, reject)=>{
+      navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(() => {
+        console.log('success')
+        resolve(true)
+      })
+      .catch((error) => {
+        // Permission denied or error occurred
+        console.error('Error requesting audio permission:', error);
+        resolve(false)
+      });
+    })
+  }
+
   const speak = async (text) => {
     if(text == defaultStartPhrase) return
+    const audioPermission = await requestAudioPermission()
+    console.log(audioPermission)
+
     setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
