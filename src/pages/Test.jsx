@@ -23,8 +23,10 @@ const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCas
 
 const Test = () => {
   const [transcript, setTranscript] = useState(''); // stores the text generated from STT
+  const [botResponse, setBotResponse] = useState('press to talk...')
   const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
 
+  const [isSpeaking, setIsSpeaking] = useState(false)
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
 
   // executes when the final result occurs
@@ -42,6 +44,9 @@ const Test = () => {
     }
   },[interimTranscript])
 
+  useEffect(() => {
+    speak(botResponse)
+  },[botResponse])
   // 
   const onFinalTranscript = async (transcript) => {
     console.log('Final result:', transcript);
@@ -53,8 +58,7 @@ const Test = () => {
       chatHistory = copyChatHistory
       console.log(chatHistory)
       console.log(response)
-      speak(response)
-
+      setBotResponse(response)
     } else {
 
     }
@@ -71,16 +75,21 @@ const Test = () => {
   };
   
   const toggleListening = async () => {
+    if(isSpeaking) return //
+
     if(listening){await stopListening()}
     else await startListening()
     console.log(listening)
   }
 
   const speak = async (text) => {
+    console.log()
+    setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
     await generateSpeech(text)
     await startListening()
+    setIsSpeaking(false)
   }
 
   return (
@@ -92,7 +101,7 @@ const Test = () => {
 
       <div className = 'bottom'>
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
-        <p>Final Result: {transcript}</p>
+        <p>{botResponse}</p>
       </div>
 
       <SpeechFooter speech = {transcript}/>
