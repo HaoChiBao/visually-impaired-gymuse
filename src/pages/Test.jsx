@@ -47,6 +47,8 @@ const Test = () => {
   useEffect(() => {
     speak(botResponse)
   },[botResponse])
+
+  useEffect(()=>{console.log(listening)},[listening])
   // 
   const onFinalTranscript = async (transcript) => {
     console.log('Final result:', transcript);
@@ -75,19 +77,18 @@ const Test = () => {
   };
   
   const toggleListening = async () => {
-    if(isSpeaking) return //
+    // if(isSpeaking) return
 
     if(listening){await stopListening()}
     else await startListening()
-    console.log(listening)
   }
 
   const speak = async (text) => {
-    console.log()
     setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
-    await generateSpeech(text)
+    const response = await generateSpeech(text)
+    console.log(response)
     await startListening()
     setIsSpeaking(false)
   }
