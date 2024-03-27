@@ -21,9 +21,11 @@ const contentAdd = '\n Keep the response length short and but keep content integ
 const keyword = 'bro'
 const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCase()}" in your response.`
 
+const defaultStartPhrase = 'press to talk...'
+
 const Test = () => {
   const [transcript, setTranscript] = useState(''); // stores the text generated from STT
-  const [botResponse, setBotResponse] = useState('press to talk...')
+  const [botResponse, setBotResponse] = useState(defaultStartPhrase)
   const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
 
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -84,6 +86,7 @@ const Test = () => {
   }
 
   const speak = async (text) => {
+    if(text == defaultStartPhrase) return
     setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
