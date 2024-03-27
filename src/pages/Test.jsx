@@ -45,12 +45,12 @@ const Test = () => {
     }
   };
 
-  const startListening = () => {
-    SpeechRecognition.startListening({ continuous: true });
+  const startListening = async () => {
+    await SpeechRecognition.startListening({ continuous: true });
   };
 
-  const stopListening = () => {
-    SpeechRecognition.stopListening();
+  const stopListening = async () => {
+    await SpeechRecognition.stopListening();
   };
 
   const toggleListening = () => {
