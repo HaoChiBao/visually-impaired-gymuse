@@ -49,15 +49,16 @@ const Test = () => {
   const startListening = async () => {
     await SpeechRecognition.startListening({ continuous: true });
   };
-
+  
   const stopListening = async () => {
     await SpeechRecognition.stopListening();
   };
-
-  const toggleListening = () => {
+  
+  const toggleListening = async () => {
     setCount(count+1)
-    if(listening){stopListening()}
-    else startListening()
+    if(listening){await stopListening()}
+    else await startListening()
+    console.log(listening)
   }
 
   return (
@@ -68,7 +69,7 @@ const Test = () => {
         <p>Final Result: {transcript}</p>
         <p>Interim: {interimTranscript}</p>
         <div>{count}</div>
-        <div>{listening}</div>
+        <div>{listening ? <p>T</p> : <p>F</p>}</div>
       </div>
     </div>
   );
