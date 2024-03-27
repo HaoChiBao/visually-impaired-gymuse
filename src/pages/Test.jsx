@@ -86,13 +86,17 @@ const Test = () => {
   }
 
   const requestAudioPermission = async () => {
+    const kys2 = document.querySelector('.kys2')
+
     return new Promise((resolve, reject)=>{
       navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(() => {
-        console.log('success')
+      .then((promise) => {
+        console.log(promise.active)
+        kys2.innerHTML = promise.active
         resolve(true)
       })
       .catch((error) => {
+        kys2.innerHTML = error
         // Permission denied or error occurred
         console.error('Error requesting audio permission:', error);
         resolve(false)
@@ -124,6 +128,7 @@ const Test = () => {
       </button>
 
       <div className="kys">hi</div>
+      <div className="kys2">bye</div>
 
       <div className = 'bottom'>
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
