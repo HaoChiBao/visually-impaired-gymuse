@@ -74,6 +74,8 @@ const Home = () => {
     } else {
 
     }
+    resetTranscript()
+    setTranscript('')
   };
 
   // start speech recognition
@@ -125,7 +127,6 @@ const Home = () => {
     await stopListening()
     e.preventDefault()
     await onFinalTranscript(transcript)
-    resetTranscript()
   }
 
   const playAudio = async () => {
