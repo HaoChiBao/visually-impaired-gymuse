@@ -137,7 +137,7 @@ const Home = () => {
     setSpeakerState(2)
     setTest('speak has changed')
     const response = await generateSpeech(text)
-    setTest('speaking has finished')
+    setTest(response)
     setIsSpeaking(false)
     if(isDown) await startListening()
     else await stopListening()
