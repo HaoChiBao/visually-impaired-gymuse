@@ -152,7 +152,7 @@ const Test = () => {
         <SpeechFooter speech = {transcript} response = {botResponse}/>
       </button>
 
-      <div className="test">{test}</div>
+      {/* <div className="test">{test}</div> */}
 
       {/* <div className = 'bottom' onClick={toggleListening}> */}
       <div className = 'bottom' 
