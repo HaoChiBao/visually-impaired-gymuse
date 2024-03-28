@@ -170,7 +170,7 @@ const Home = () => {
   return (
     <section>
 
-      <button className = 'top'>
+      <button className = 'top' onClick ={playAudio}>
         {/* <p>{botResponse}</p> */}
         <SpeechFooter speech = {transcript} response = {botResponse}/>
       </button>
