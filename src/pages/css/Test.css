@@ -16,28 +16,6 @@ section{
     position: relative;
 }
 
-section p {
-    max-width: 70vw;
-    z-index: 1;
-  
-    /* highlight text */
-    color:#ffd000;
-    background-color: rgb(22, 22, 22);
-    padding: 5px 10px;
-    border-radius: 10px;
-  
-    font-size: 1.2rem;
-    font-weight: bold;
-  
-    pointer-events: none;
-    
-    /* remove touch events for mobile */
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Standard syntax */
-}
-
 section .top {
     display: flex;
     flex-direction: column;
@@ -45,13 +23,13 @@ section .top {
     align-items: center;
     
     width: 100%;
-    height: 50%;
+    height: 100%;
   
     background-color: transparent;
     outline: none;
     border: none;
 }
-  
+
 section .bottom {
     /* padding-top: 20px; */
     display: flex;
@@ -59,5 +37,10 @@ section .bottom {
     align-items: center;
     
     width: 100%;
-    height: 50%;
+    /* height: 50%; */
+    background-color: transparent;
+    outline: none;
+    border: none;
+
+    margin: 40px;
 }

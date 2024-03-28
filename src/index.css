@@ -5,3 +5,25 @@
   padding: 0;
   font-family: 'GTWalsheimPro-Regular', sans-serif ;
 }
+
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background:transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background-color: white;
+  background-clip: content-box;
+  border: 5px solid transparent;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  opacity: 0.8;
+}

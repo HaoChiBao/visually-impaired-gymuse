@@ -1,9 +1,14 @@
 import './componentCss/SpeechFooter.css'
 
-const SpeechFooter = ({speech}) => {
+const SpeechFooter = ({speech, response}) => {
     return (
         <div className="speech-footer">
-            {speech}
+            <div className="response">
+                <p>{response}</p>
+            </div>
+            <div className="speech">
+                <p>{speech}</p>
+            </div>
         </div>
     )
 }

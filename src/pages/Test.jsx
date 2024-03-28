@@ -21,11 +21,13 @@ const contentAdd = '\n Keep the response length short and but keep content integ
 const keyword = 'bro'
 const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCase()}" in your response.`
 
-const defaultStartPhrase = 'press to talk...'
+const defaultResponsePhrase = 'press to talk...'
+// const defaultResponsePhrase = 'Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+const defaultTranscriptPhrase = 'user voice here'
 
 const Test = () => {
-  const [transcript, setTranscript] = useState(''); // stores the text generated from STT
-  const [botResponse, setBotResponse] = useState(defaultStartPhrase)
+  const [transcript, setTranscript] = useState(defaultTranscriptPhrase); // stores the text generated from STT
+  const [botResponse, setBotResponse] = useState(defaultResponsePhrase)
   const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
 
   const [isSpeaking, setIsSpeaking] = useState(false)
@@ -80,7 +82,7 @@ const Test = () => {
   
   const toggleListening = async () => {
     // if(isSpeaking) return
-
+    pulseSpeakerBubble()
     if(listening){await stopListening()}
     else await startListening()
   }
@@ -105,9 +107,9 @@ const Test = () => {
   }
 
   const speak = async (text) => {
-    if(text == defaultStartPhrase) return
-    const audioPermission = await requestAudioPermission()
-    console.log(audioPermission)
+    if(text == defaultResponsePhrase) return
+    // const audioPermission = await requestAudioPermission()
+    // console.log(audioPermission)
 
     setIsSpeaking(true)
     await stopListening()
@@ -123,19 +125,19 @@ const Test = () => {
   return (
     <section>
 
-      <button className = 'top' onClick={toggleListening}>
-        <SpeakerBubble state = {speakerState}/>
+      <button className = 'top'>
+        {/* <p>{botResponse}</p> */}
+        <SpeechFooter speech = {transcript} response = {botResponse}/>
       </button>
 
       <div className="kys">hi</div>
-      <div className="kys2">bye</div>
+      {/* <div className="kys2">bye</div> */}
 
-      <div className = 'bottom'>
+      <div className = 'bottom' onClick={toggleListening}>
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
-        <p>{botResponse}</p>
+        <SpeakerBubble state = {speakerState}/>
       </div>
 
-      <SpeechFooter speech = {transcript}/>
     </section>
   );
 };
