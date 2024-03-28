@@ -70,16 +70,19 @@ const Test = () => {
     }
   };
 
+  // start speech recognition
   const startListening = async () => {
     setSpeakerState(1)
     await SpeechRecognition.startListening({ continuous: true });
   };
   
+  // stop speech recognition
   const stopListening = async () => {
     setSpeakerState(0)
     await SpeechRecognition.stopListening();
   };
   
+  // toggles between speech recognition
   const toggleListening = async () => {
     // if(isSpeaking) return
     pulseSpeakerBubble()
@@ -106,6 +109,16 @@ const Test = () => {
     })
   }
 
+  const handleDown = async (e) => {
+    await startListening()
+    e.preventDefault()
+  }
+
+  const handleUp = async (e) => {
+    await stopListening()
+    e.preventDefault()
+  }
+
   const speak = async (text) => {
     if(text == defaultResponsePhrase) return
     // const audioPermission = await requestAudioPermission()
@@ -115,9 +128,11 @@ const Test = () => {
     await stopListening()
     setSpeakerState(2)
     const response = await generateSpeech(text)
+
     console.log(response)
     const kys = document.querySelector('.kys')
     kys.innerHTML = response
+
     await startListening()
     setIsSpeaking(false)
   }
@@ -133,7 +148,14 @@ const Test = () => {
       <div className="kys">hi</div>
       {/* <div className="kys2">bye</div> */}
 
-      <div className = 'bottom' onClick={toggleListening}>
+      {/* <div className = 'bottom' onClick={toggleListening}> */}
+      <div className = 'bottom' 
+        onMouseDown={handleDown} 
+        onTouchStart={handleDown}
+
+        onMouseUp={handleUp}
+        onTouchEnd={handleUp}
+      >
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
         <SpeakerBubble state = {speakerState}/>
       </div>
