@@ -39,7 +39,7 @@ const Home = () => {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
 
-  const [audioSource, setAudioSource] = useState(null)
+  const [responseAudio, setResponseAudio] = useState(null)
 
   const [test, setTest] = useState('test')
   // executes when the final result occurs
@@ -116,9 +116,10 @@ const Home = () => {
   }
 
   const handleDown = async (e) => {
-    playSoundEffect(0)
+    playAudio(onSound)
+    
     resetTranscript()
-    setTranscript('')
+    setTranscript(defaultTranscriptPhrase)
     
     setIsDown(true)
     pulseSpeakerBubble()
@@ -127,7 +128,8 @@ const Home = () => {
   }
   
   const handleUp = async (e) => {
-    playSoundEffect(1)
+    playAudio(offSound)
+    // playSoundEffect(1)
     
     setIsDown(false)
     pulseSpeakerBubble()
@@ -136,7 +138,12 @@ const Home = () => {
     await onFinalTranscript(transcript)
   }
 
-  const playAudio = async () => {
+  const handleTopClick = async (e) =>{
+    await playAudio(responseAudio)
+  }
+
+  const playAudio = async (source) => {
+    audio.src = source
     return new Promise(async (resolve, reject)=>{
       try{
         audio.pause()
@@ -153,25 +160,6 @@ const Home = () => {
     })
   }
 
-  const playSoundEffect = async (sound) => {
-    const soundEffect = new Audio(onSound)
-    return new Promise ((resolve, reject)=>{
-      try{
-        if(sound==1){
-          soundEffect.src = offSound
-        }
-  
-        soundEffect.play()
-  
-        soundEffect.onended = () => {
-          resolve()
-        }
-      } catch (err){
-        resolve(err)
-      }
-    })
-  }
-
   const speak = async (text) => {
     if(text == defaultResponsePhrase) return
     // const test2 = document.querySelector('.test2')
@@ -183,8 +171,8 @@ const Home = () => {
     await stopListening()
     setSpeakerState(2)
     const source = await generateSpeech(text)
-    audio.src = source
-    const response = await playAudio()
+    setResponseAudio(source)
+    const response = await playAudio(source)
     
     const test = document.querySelector('.test')
     test.innerHTML = response
@@ -198,7 +186,7 @@ const Home = () => {
   return (
     <section>
 
-      <button className = 'top' onClick ={playAudio}>
+      <button className = 'top' onClick ={handleTopClick}>
         {/* <p>{botResponse}</p> */}
         <SpeechFooter speech = {transcript} response = {botResponse}/>
       </button>
