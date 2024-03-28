@@ -125,14 +125,16 @@ const Home = () => {
 
   const speak = async (text) => {
     if(text == defaultResponsePhrase) return
-    // const audioPermission = await requestAudioPermission()
+    const test2 = document.querySelector('.test2')
+    const audioPermission = await requestAudioPermission()
+    test2.innerHTML = audioPermission
     // console.log(audioPermission)
-
+    
     setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
     const response = await generateSpeech(text)
-
+    
     const test = document.querySelector('.test')
     test.innerHTML = response
 
@@ -152,6 +154,7 @@ const Home = () => {
 
       {/* <div className="test">{test}</div> */}
       <div className="test">test</div>
+      <div className="test2">test2</div>
 
       {/* <div className = 'bottom' onClick={toggleListening}> */}
       <div className = 'bottom' 
