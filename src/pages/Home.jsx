@@ -7,6 +7,9 @@ import { SpeakerBubble, changeSpeakerBubble, pulseSpeakerBubble } from '../compo
 import generateResponse from '../functions/generateResponse';
 import generateSpeech from '../functions/generateSpeech';
 
+import onSound from '../audio/recognitionOn.mp3'
+import offSound from '../audio/recognitionOff.mp3'
+
 import './css/Test.css'
 
 const audio = new Audio()
@@ -113,6 +116,7 @@ const Home = () => {
   }
 
   const handleDown = async (e) => {
+    playSoundEffect(0)
     resetTranscript()
     setTranscript('')
     
@@ -123,6 +127,8 @@ const Home = () => {
   }
   
   const handleUp = async (e) => {
+    playSoundEffect(1)
+    
     setIsDown(false)
     pulseSpeakerBubble()
     await stopListening()
@@ -142,6 +148,25 @@ const Home = () => {
 
       } catch (err){
         console.log(err)
+        resolve(err)
+      }
+    })
+  }
+
+  const playSoundEffect = async (sound) => {
+    const soundEffect = new Audio(onSound)
+    return new Promise ((resolve, reject)=>{
+      try{
+        if(sound==1){
+          soundEffect.src = offSound
+        }
+  
+        soundEffect.play()
+  
+        soundEffect.onended = () => {
+          resolve()
+        }
+      } catch (err){
         resolve(err)
       }
     })
