@@ -74,8 +74,6 @@ const Home = () => {
     } else {
 
     }
-    resetTranscript()
-    setTranscript('')
   };
 
   // start speech recognition
@@ -115,6 +113,9 @@ const Home = () => {
   }
 
   const handleDown = async (e) => {
+    resetTranscript()
+    setTranscript('')
+    
     setIsDown(true)
     pulseSpeakerBubble()
     await startListening()
