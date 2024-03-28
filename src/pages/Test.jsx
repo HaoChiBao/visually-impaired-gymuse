@@ -110,11 +110,13 @@ const Test = () => {
   }
 
   const handleDown = async (e) => {
+    pulseSpeakerBubble()
     await startListening()
     e.preventDefault()
   }
-
+  
   const handleUp = async (e) => {
+    pulseSpeakerBubble()
     await stopListening()
     e.preventDefault()
     onFinalTranscript(transcript)
