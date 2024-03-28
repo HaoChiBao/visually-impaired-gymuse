@@ -82,12 +82,14 @@ const Home = () => {
   // start speech recognition
   const startListening = async () => {
     setSpeakerState(1)
+    playAudio(onSound)
     if(!listening) await SpeechRecognition.startListening({ continuous: true });
   };
   
   // stop speech recognition
   const stopListening = async () => {
     setSpeakerState(0)
+    playAudio(offSound)
     if(listening) await SpeechRecognition.stopListening();
   };
   
