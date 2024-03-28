@@ -156,10 +156,10 @@ const Home = () => {
     setSpeakerState(2)
     const source = await generateSpeech(text)
     audio.src = source
-    await playAudio()
+    const response = await playAudio()
     
-    // const test = document.querySelector('.test')
-    // test.innerHTML = response
+    const test = document.querySelector('.test')
+    test.innerHTML = response
 
     setIsSpeaking(false)
     if(isDown) await startListening()
@@ -176,8 +176,8 @@ const Home = () => {
       </button>
 
       {/* <div className="test">{test}</div> */}
-      {/* <div className="test">test</div>
-      <div className="test2">test2</div> */}
+      <div className="test">test</div>
+      {/* <div className="test2">test2</div> */}
 
       {/* <div className = 'bottom' onClick={toggleListening}> */}
       <div className = 'bottom' 
