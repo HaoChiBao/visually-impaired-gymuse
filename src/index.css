@@ -17,7 +17,7 @@
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background-color: white;
+  background-color: rgb(0, 0, 0);
   background-clip: content-box;
   border: 5px solid transparent;
   border-radius: 10px;

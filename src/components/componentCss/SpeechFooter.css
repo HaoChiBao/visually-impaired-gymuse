@@ -15,17 +15,16 @@
     /* padding: 5px 10px;  */
     
     border-radius: 20px;
-    
 }
 
 .speech-footer .response{
     height: 50vh;
     width: 100%;
-    background-color: #181818;
+    background-color: #18181899;
     
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     
     overflow-x: hidden;
     overflow-y: auto;

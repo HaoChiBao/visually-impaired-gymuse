@@ -156,6 +156,7 @@ const Home = () => {
       } catch (err){
         console.log(err)
         resolve(err)
+        
       }
     })
   }
