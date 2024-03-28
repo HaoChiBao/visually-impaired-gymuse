@@ -29,15 +29,18 @@ const Test = () => {
   const [transcript, setTranscript] = useState(defaultTranscriptPhrase); // stores the text generated from STT
   const [botResponse, setBotResponse] = useState(defaultResponsePhrase)
   const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
+  const [isDown, setIsDown] = useState(false)
 
   const [isSpeaking, setIsSpeaking] = useState(false)
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
 
+  const [test, setTest] = useState('test')
   // executes when the final result occurs
   useEffect(() => {
     if (finalTranscript !== '') {
       onFinalTranscript(finalTranscript);
-      resetTranscript(); // Reset transcript after saving
+      setTranscript(finalTranscript);
+      resetTranscript();
     }
   }, [finalTranscript, resetTranscript]);
 
@@ -56,9 +59,8 @@ const Test = () => {
   // 
   const onFinalTranscript = async (transcript) => {
     console.log('Final result:', transcript);
-    setTranscript(transcript);
-
-    if((transcript.toLowerCase()).includes(keyword)){
+    console.log(isSpeaking)
+    if((transcript.toLowerCase()).includes(keyword) && !isSpeaking){
       chatHistory.push({role: 'user', content: transcript + contentAdd})
       const [response, copyChatHistory] = await generateResponse(chatHistory)
       chatHistory = copyChatHistory
@@ -73,13 +75,13 @@ const Test = () => {
   // start speech recognition
   const startListening = async () => {
     setSpeakerState(1)
-    await SpeechRecognition.startListening({ continuous: true });
+    if(!listening) await SpeechRecognition.startListening({ continuous: true });
   };
   
   // stop speech recognition
   const stopListening = async () => {
     setSpeakerState(0)
-    await SpeechRecognition.stopListening();
+    if(listening) await SpeechRecognition.stopListening();
   };
   
   // toggles between speech recognition
@@ -91,17 +93,14 @@ const Test = () => {
   }
 
   const requestAudioPermission = async () => {
-    const kys2 = document.querySelector('.kys2')
 
     return new Promise((resolve, reject)=>{
       navigator.mediaDevices.getUserMedia({ audio: true })
       .then((promise) => {
         console.log(promise.active)
-        kys2.innerHTML = promise.active
         resolve(true)
       })
       .catch((error) => {
-        kys2.innerHTML = error
         // Permission denied or error occurred
         console.error('Error requesting audio permission:', error);
         resolve(false)
@@ -110,16 +109,18 @@ const Test = () => {
   }
 
   const handleDown = async (e) => {
+    setIsDown(true)
     pulseSpeakerBubble()
     await startListening()
     e.preventDefault()
   }
   
   const handleUp = async (e) => {
+    setIsDown(false)
     pulseSpeakerBubble()
     await stopListening()
     e.preventDefault()
-    onFinalTranscript(transcript)
+    // onFinalTranscript(transcript)
   }
 
   const speak = async (text) => {
@@ -128,16 +129,19 @@ const Test = () => {
     // console.log(audioPermission)
 
     setIsSpeaking(true)
+    setTest('starting speak()')
+
     await stopListening()
+
+    setTest('speak is changing')
     setSpeakerState(2)
+    setTest('speak has changed')
     const response = await generateSpeech(text)
-
-    console.log(response)
-    const kys = document.querySelector('.kys')
-    kys.innerHTML = response
-
-    await startListening()
+    setTest('speaking has finished')
     setIsSpeaking(false)
+    if(isDown) await startListening()
+    else await stopListening()
+
   }
 
   return (
@@ -148,8 +152,7 @@ const Test = () => {
         <SpeechFooter speech = {transcript} response = {botResponse}/>
       </button>
 
-      <div className="kys">hi</div>
-      {/* <div className="kys2">bye</div> */}
+      <div className="test">{test}</div>
 
       {/* <div className = 'bottom' onClick={toggleListening}> */}
       <div className = 'bottom' 
