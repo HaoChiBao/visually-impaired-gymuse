@@ -129,15 +129,13 @@ const Home = () => {
     // console.log(audioPermission)
 
     setIsSpeaking(true)
-    setTest('starting speak()')
-
     await stopListening()
-
-    setTest('speak is changing')
     setSpeakerState(2)
-    setTest('speak has changed')
     const response = await generateSpeech(text)
-    setTest(response)
+
+    const test = document.querySelector('.test')
+    test.innerHTML = response
+
     setIsSpeaking(false)
     if(isDown) await startListening()
     else await stopListening()
@@ -152,7 +150,8 @@ const Home = () => {
         <SpeechFooter speech = {transcript} response = {botResponse}/>
       </button>
 
-      <div className="test">{test}</div>
+      {/* <div className="test">{test}</div> */}
+      <div className="test">test</div>
 
       {/* <div className = 'bottom' onClick={toggleListening}> */}
       <div className = 'bottom' 
