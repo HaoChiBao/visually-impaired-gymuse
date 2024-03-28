@@ -62,7 +62,7 @@ const Home = () => {
     speak(botResponse)
   },[botResponse])
 
-  useEffect(()=>{console.log(listening)},[listening])
+  // useEffect(()=>{console.log(listening)},[listening])
   // 
   const onFinalTranscript = async (transcript) => {
     // console.log('Final result:', transcript);
@@ -116,7 +116,7 @@ const Home = () => {
   }
 
   const handleDown = async (e) => {
-    playAudio(onSound)
+    playAudio(onSound).then(response => {console.log(response)})
     
     resetTranscript()
     setTranscript(defaultTranscriptPhrase)
@@ -128,7 +128,7 @@ const Home = () => {
   }
   
   const handleUp = async (e) => {
-    playAudio(offSound)
+    playAudio(offSound).then(response => {console.log(response)})
     // playSoundEffect(1)
     
     setIsDown(false)
@@ -155,8 +155,12 @@ const Home = () => {
 
       } catch (err){
         console.log(err)
+        const test = document.querySelector('.test')
+        test.style.color = 'red'
+        test.innerHTML = err
+        setTimeout(()=>{test.style.color = 'black'},1000)
         resolve(err)
-        
+
       }
     })
   }
@@ -175,9 +179,6 @@ const Home = () => {
     setResponseAudio(source)
     const response = await playAudio(source)
     
-    const test = document.querySelector('.test')
-    test.innerHTML = response
-
     setIsSpeaking(false)
     if(isDown) await startListening()
     else await stopListening()
