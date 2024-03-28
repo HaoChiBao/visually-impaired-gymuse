@@ -95,7 +95,10 @@ const Home = () => {
   const toggleListening = async () => {
     // if(isSpeaking) return
     pulseSpeakerBubble()
-    if(listening){await stopListening()}
+    if(listening){
+      await stopListening()
+      await onFinalTranscript(transcript)
+    }
     else await startListening()
   }
 
@@ -180,8 +183,9 @@ const Home = () => {
     const response = await playAudio(source)
     
     setIsSpeaking(false)
-    if(isDown) await startListening()
-    else await stopListening()
+    await stopListening()
+    // if(isDown) await startListening()
+    // else await stopListening()
 
   }
 
@@ -197,14 +201,14 @@ const Home = () => {
       <div className="test">test</div>
       {/* <div className="test2">test2</div> */}
 
-      {/* <div className = 'bottom' onClick={toggleListening}> */}
-      <div className = 'bottom' 
+      <div className = 'bottom' onClick={toggleListening}>
+      {/* <div className = 'bottom' 
         onMouseDown={handleDown} 
         onTouchStart={handleDown}
 
         onMouseUp={handleUp}
         onTouchEnd={handleUp}
-      >
+      > */}
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
         <SpeakerBubble state = {speakerState}/>
       </div>
