@@ -9,6 +9,8 @@ import generateSpeech from '../functions/generateSpeech';
 
 import './css/Test.css'
 
+const audio = new Audio()
+
 let chatHistory = [
   {
     role: 'system',
@@ -34,11 +36,13 @@ const Home = () => {
   const [isSpeaking, setIsSpeaking] = useState(false)
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
 
+  const [audioSource, setAudioSource] = useState(null)
+
   const [test, setTest] = useState('test')
   // executes when the final result occurs
   useEffect(() => {
     if (finalTranscript !== '') {
-      onFinalTranscript(finalTranscript);
+      // onFinalTranscript(finalTranscript);
       setTranscript(finalTranscript);
       resetTranscript();
     }
@@ -95,7 +99,7 @@ const Home = () => {
   const requestAudioPermission = async () => {
 
     return new Promise((resolve, reject)=>{
-      navigator.mediaDevices.getUserMedia({ audio: true })
+      navigator.mediaDevices.getUserMedia({ audio: true,  })
       .then((promise) => {
         console.log(promise.active)
         resolve(true)
@@ -120,23 +124,42 @@ const Home = () => {
     pulseSpeakerBubble()
     await stopListening()
     e.preventDefault()
-    // onFinalTranscript(transcript)
+    onFinalTranscript(transcript)
+  }
+
+  const playAudio = async () => {
+    return new Promise(async (resolve, reject)=>{
+      try{
+        audio.pause()
+        await audio.play();
+
+        audio.onended = () => {
+          resolve(true)
+        }
+
+      } catch (err){
+        console.log(err)
+        resolve(err)
+      }
+    })
   }
 
   const speak = async (text) => {
     if(text == defaultResponsePhrase) return
-    const test2 = document.querySelector('.test2')
-    const audioPermission = await requestAudioPermission()
-    test2.innerHTML = audioPermission
+    // const test2 = document.querySelector('.test2')
+    // const audioPermission = await requestAudioPermission()
+    // test2.innerHTML = audioPermission
     // console.log(audioPermission)
     
     setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
-    const response = await generateSpeech(text)
+    const source = await generateSpeech(text)
+    audio.src = source
+    await playAudio()
     
-    const test = document.querySelector('.test')
-    test.innerHTML = response
+    // const test = document.querySelector('.test')
+    // test.innerHTML = response
 
     setIsSpeaking(false)
     if(isDown) await startListening()
@@ -153,8 +176,8 @@ const Home = () => {
       </button>
 
       {/* <div className="test">{test}</div> */}
-      <div className="test">test</div>
-      <div className="test2">test2</div>
+      {/* <div className="test">test</div>
+      <div className="test2">test2</div> */}
 
       {/* <div className = 'bottom' onClick={toggleListening}> */}
       <div className = 'bottom' 

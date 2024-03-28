@@ -1,11 +1,11 @@
 const GOOGLE_TTS_KEY = process.env.REACT_APP_GOOGLE_TTS_KEY
 
-let audio = new Audio();
-
+// let audio = new Audio()
 const generateSpeech = async (transcript) => {
+
   return new Promise(async (resolve, reject) => {
     
-    if(!audio.paused) audio.pause();
+    // if(!audio.paused) audio.pause();
     const apiUrl = `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${GOOGLE_TTS_KEY}`;
     
     const requestBody = JSON.stringify({
@@ -40,19 +40,19 @@ const generateSpeech = async (transcript) => {
   
       const data = await response.json();
       const audioContent = data.audioContent;
+      const source = `data:audio/wav;base64,${audioContent}`;
+      resolve(source)
 
-      audio.src = `data:audio/wav;base64,${audioContent}`;
+      // audio.src = source
+      // audio.load()
+      // await audio.play();
 
-      audio.load()
-      await audio.play();
-
-      audio.onended = () => {
-        resolve(true)
-      }
-
+      // audio.onended = () => {
+      //   resolve(true)
+      // }
     } catch (err) {
       console.error('Error generating speech:', err.message || err);
-      resolve(err)
+      resolve(false)
     }
 
   })
