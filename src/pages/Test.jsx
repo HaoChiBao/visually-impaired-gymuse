@@ -58,7 +58,7 @@ const Test = () => {
     console.log('Final result:', transcript);
     setTranscript(transcript);
 
-    if((transcript.toLowerCase()).includes('bro')){
+    if((transcript.toLowerCase()).includes(keyword)){
       chatHistory.push({role: 'user', content: transcript + contentAdd})
       const [response, copyChatHistory] = await generateResponse(chatHistory)
       chatHistory = copyChatHistory
@@ -117,6 +117,7 @@ const Test = () => {
   const handleUp = async (e) => {
     await stopListening()
     e.preventDefault()
+    onFinalTranscript(transcript)
   }
 
   const speak = async (text) => {
