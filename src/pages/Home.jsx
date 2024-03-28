@@ -62,8 +62,8 @@ const Home = () => {
   useEffect(()=>{console.log(listening)},[listening])
   // 
   const onFinalTranscript = async (transcript) => {
-    console.log('Final result:', transcript);
-    console.log(isSpeaking)
+    // console.log('Final result:', transcript);
+    // console.log(isSpeaking)
     if((transcript.toLowerCase()).includes(keyword) && !isSpeaking){
       chatHistory.push({role: 'user', content: transcript + contentAdd})
       const [response, copyChatHistory] = await generateResponse(chatHistory)
@@ -124,7 +124,8 @@ const Home = () => {
     pulseSpeakerBubble()
     await stopListening()
     e.preventDefault()
-    onFinalTranscript(transcript)
+    await onFinalTranscript(transcript)
+    resetTranscript()
   }
 
   const playAudio = async () => {
