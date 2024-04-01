@@ -34,7 +34,6 @@ const Home = () => {
   const [transcript, setTranscript] = useState(defaultTranscriptPhrase); // stores the text generated from STT
   const [botResponse, setBotResponse] = useState(defaultResponsePhrase)
   const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
-  const [isDown, setIsDown] = useState(false)
 
   const [isSpeaking, setIsSpeaking] = useState(false)
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
@@ -91,6 +90,7 @@ const Home = () => {
     setSpeakerState(0)
     playAudio(offSound)
     if(listening) await SpeechRecognition.stopListening();
+    await onFinalTranscript(transcript)
   };
   
   // toggles between speech recognition
@@ -99,7 +99,6 @@ const Home = () => {
     pulseSpeakerBubble()
     if(listening){
       await stopListening()
-      await onFinalTranscript(transcript)
     }
     else await startListening()
   }
