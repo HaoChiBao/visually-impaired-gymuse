@@ -90,9 +90,6 @@ const Home = () => {
     setSpeakerState(0)
     playAudio(offSound)
     if(listening) await SpeechRecognition.stopListening();
-
-    // why?
-    await onFinalTranscript(transcript)
   };
   
   // toggles between speech recognition
@@ -122,25 +119,9 @@ const Home = () => {
   }
 
   const handleDown = async (e) => {
-    playAudio(onSound).then(response => {console.log(response)})
-    
-    resetTranscript()
-    setTranscript(defaultTranscriptPhrase)
-    
-    setIsDown(true)
-    pulseSpeakerBubble()
-    await startListening()
-    e.preventDefault()
   }
   
   const handleUp = async (e) => {
-    playAudio(offSound).then(response => {console.log(response)})
-    // playSoundEffect(1)
-    
-    setIsDown(false)
-    pulseSpeakerBubble()
-    await stopListening()
-    e.preventDefault()
     await onFinalTranscript(transcript)
   }
 
@@ -204,7 +185,7 @@ const Home = () => {
       <div className="test">test</div>
       {/* <div className="test2">test2</div> */}
 
-      <div className = 'bottom' onClick={toggleListening}>
+      <div className = 'bottom' onClick={toggleListening} onMouseUp={handleUp} onTouchEnd={handleUp}>
       {/* <div className = 'bottom' 
         onMouseDown={handleDown} 
         onTouchStart={handleDown}
