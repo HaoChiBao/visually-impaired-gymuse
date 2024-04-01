@@ -47,6 +47,7 @@ const Home = () => {
       // onFinalTranscript(finalTranscript);
       setTranscript(finalTranscript);
       resetTranscript();
+      setTranscript(defaultTranscriptPhrase)
     }
   }, [finalTranscript, resetTranscript]);
 
