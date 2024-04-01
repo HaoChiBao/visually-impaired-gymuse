@@ -97,6 +97,7 @@ const Home = () => {
     // if(isSpeaking) return
     pulseSpeakerBubble()
     if(listening){
+      onFinalTranscript(transcript)
       await stopListening()
     }
     else await startListening()
@@ -185,7 +186,7 @@ const Home = () => {
       <div className="test">test</div>
       {/* <div className="test2">test2</div> */}
 
-      <div className = 'bottom' onClick={toggleListening} onMouseUp={handleUp} onTouchEnd={handleUp}>
+      <div className = 'bottom' onClick={toggleListening}>
       {/* <div className = 'bottom' 
         onMouseDown={handleDown} 
         onTouchStart={handleDown}
