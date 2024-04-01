@@ -89,7 +89,9 @@ const Home = () => {
   const stopListening = async () => {
     setSpeakerState(0)
     playAudio(offSound)
-    if(listening) {await SpeechRecognition.stopListening();}
+    if(listening) await SpeechRecognition.stopListening();
+
+    // why?
     await onFinalTranscript(transcript)
   };
   
