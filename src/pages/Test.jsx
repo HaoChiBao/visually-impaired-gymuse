@@ -29,6 +29,7 @@ const Test = () => {
   };
 
   const handleRecordComplete = async (blob) => {
+    addAudioElement(blob);
     const text = await generateText(blob);
     setTranscript(text);
   }
