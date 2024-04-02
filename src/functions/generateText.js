@@ -7,12 +7,14 @@ const model = 'whisper-1';
 const generateText = async (audioBlob) => {
     console.log(audioBlob)
     // save audio blob as a local file
-    const audioFile = new File([audioBlob], 'audio.webm', {type: 'audio/webm'});
+    // const audioFile = new File([audioBlob], 'audio.webm', {type: 'audio/webm'});
+    const blob = new Blob([audioBlob], {type: 'audio/webm'});
+    // console.log(blob)
 
     const formData = new FormData();
     formData.append('model', model);
     // formData.append('file', audioBlob);
-    formData.append('file', audioFile);
+    formData.append('file', blob, 'audio.webm');
     // define language type ENGLISH
     formData.append('language', 'en'); // Set language to English
 
