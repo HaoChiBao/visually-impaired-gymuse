@@ -47,7 +47,6 @@ const Home = () => {
       // onFinalTranscript(finalTranscript);
       setTranscript(finalTranscript);
       resetTranscript();
-      setTranscript(defaultTranscriptPhrase)
     }
   }, [finalTranscript, resetTranscript]);
 
@@ -91,6 +90,7 @@ const Home = () => {
     setSpeakerState(0)
     playAudio(offSound)
     if(listening) await SpeechRecognition.stopListening();
+    onFinalTranscript(transcript)
   };
   
   // toggles between speech recognition
@@ -98,7 +98,6 @@ const Home = () => {
     // if(isSpeaking) return
     pulseSpeakerBubble()
     if(listening){
-      onFinalTranscript(transcript)
       await stopListening()
     }
     else await startListening()
