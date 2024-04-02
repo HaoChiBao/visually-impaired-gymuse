@@ -38,6 +38,7 @@ const Home = () => {
   const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
 
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [resetUserString, setResetUserString] = useState(false)
   const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
 
   const [responseAudio, setResponseAudio] = useState(null)
@@ -56,12 +57,17 @@ const Home = () => {
       setTranscript(finalTranscript);
       resetTranscript();
 
-      transcriptTimeout = setTimeout(() => {setTranscript(defaultTranscriptPhrase)}, 1000)
+      transcriptTimeout = setTimeout(() => {setResetUserString(true)}, 1000)
     }
   }, [finalTranscript, resetTranscript]);
 
   useEffect(()=>{
     if(interimTranscript != ''){
+      if(resetUserString){
+        setTranscript('')
+        setResetUserString(false)
+      }
+      
       setTranscript(interimTranscript)
       pulseSpeakerBubble()
       clearTimeout(transcriptTimeout)
