@@ -72,7 +72,7 @@ const changeSpeakerBubble = (isSpeaking = true, isListening = false) => {
     }
 }
 
-const SpeakerBubble = ({state}) => {
+const SpeakerBubble = ({state, clickEvent}) => {
     useEffect(() => {
         if(state == 0){
             changeSpeakerBubble(false, false)
@@ -83,7 +83,7 @@ const SpeakerBubble = ({state}) => {
         }
     },[state])
     return (
-        <div className="speakerBubble">
+        <div className="speakerBubble" onClick = {clickEvent}>
             <div className="inner">
                 <img src={Speaker} alt="" />
             </div>

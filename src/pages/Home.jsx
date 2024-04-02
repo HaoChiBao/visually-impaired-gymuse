@@ -45,6 +45,8 @@ const Home = () => {
   const [speechColour, setSpeechColour] = useState(0)
   const [responseColour, setResponseColour] = useState(0)
 
+  const [contrast, setContrast] = useState(1)
+
   const [test, setTest] = useState('test')
   // executes when the final result occurs
   useEffect(() => {
@@ -109,7 +111,9 @@ const Home = () => {
   };
   
   // toggles between speech recognition
-  const toggleListening = async () => {
+  const toggleListening = async (e) => {
+    e.stopPropagation()
+
     // if(isSpeaking) return
     pulseSpeakerBubble()
     if(listening){
@@ -146,6 +150,7 @@ const Home = () => {
   }
 
   const handleTopClick = async (e) =>{
+    e.stopPropagation()
     setResponseColour(0)
     await playAudio(responseAudio)
   }
@@ -194,8 +199,18 @@ const Home = () => {
 
   }
 
+  const toggleContrast = () => {
+    const TOGGLE_AMOUNT = 5
+    
+    const r = document.querySelector(':root')
+    const percent = 100 + (contrast % TOGGLE_AMOUNT) * 15
+    console.log(percent)
+    r.style.setProperty('--contrast', `${percent}%`)
+    setContrast(contrast + 1)
+  }
+
   return (
-    <section>
+    <section onClick = {toggleContrast}>
 
       <button className = 'top' onClick ={handleTopClick}>
         {/* <p>{botResponse}</p> */}
@@ -210,7 +225,7 @@ const Home = () => {
       <div className="test">test</div>
       {/* <div className="test2">test2</div> */}
 
-      <div className = 'bottom' onClick={toggleListening}>
+      <div className = 'bottom'>
       {/* <div className = 'bottom' 
         onMouseDown={handleDown} 
         onTouchStart={handleDown}
@@ -219,7 +234,7 @@ const Home = () => {
         onTouchEnd={handleUp}
       > */}
         {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
-        <SpeakerBubble state = {speakerState}/>
+        <SpeakerBubble state = {speakerState} clickEvent = {toggleListening}/>
       </div>
 
     </section>

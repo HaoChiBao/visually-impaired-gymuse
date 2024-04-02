@@ -25,8 +25,8 @@ const SpeechFooter = ({speech, response, speechColour, responseColour}) => {
             responseElement.style.color = '#000'
         }
 
-        console.log('speechColour', speechColour)
-        console.log('responseColour', responseColour)
+        // console.log('speechColour', speechColour)
+        // console.log('responseColour', responseColour)
     },[speechColour, responseColour])
     return (
         <div className="speech-footer">

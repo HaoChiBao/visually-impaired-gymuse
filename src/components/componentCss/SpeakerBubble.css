@@ -25,7 +25,7 @@
 
     transition: 0.3s ease;
 
-    pointer-events: none;
+    /* pointer-events: none; */
   
     /* remove touch events for mobile */  
     -webkit-user-select: none; /* Safari */
@@ -35,7 +35,7 @@
 }
 
 .speakerBubble * {
-    pointer-events: none;
+    /* pointer-events: none; */
   
     /* remove touch events for mobile */
     -webkit-user-select: none; /* Safari */
