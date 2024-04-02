@@ -10,7 +10,7 @@ import generateSpeech from '../functions/generateSpeech';
 import onSound from '../audio/recognitionOn.mp3'
 import offSound from '../audio/recognitionOff.mp3'
 
-import './css/Test.css'
+import './css/Home.css'
 
 const audio = new Audio()
 
@@ -215,7 +215,7 @@ const Home = () => {
   }
 
   return (
-    <section onClick = {toggleContrast}>
+    <section id = "Home" onClick = {toggleContrast}>
 
       <button className = 'top' onClick ={handleTopClick}>
         {/* <p>{botResponse}</p> */}
