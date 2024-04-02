@@ -67,7 +67,10 @@ const Home = () => {
   },[interimTranscript])
 
   useEffect(() => {
-    speak(botResponse)
+    if(botResponse != defaultResponsePhrase){
+      setResponseColour(1)
+      speak(botResponse)
+    }
   },[botResponse])
 
   // useEffect(()=>{console.log(listening)},[listening])
@@ -77,6 +80,7 @@ const Home = () => {
     // console.log(isSpeaking)
     if((transcript.toLowerCase()).includes(keyword) && !isSpeaking){
       setSpeechColour(1) // indicates to user that the response is being processed
+      setResponseColour(2)
 
       chatHistory.push({role: 'user', content: transcript + contentAdd})
       const [response, copyChatHistory] = await generateResponse(chatHistory)
@@ -142,6 +146,7 @@ const Home = () => {
   }
 
   const handleTopClick = async (e) =>{
+    setResponseColour(0)
     await playAudio(responseAudio)
   }
 

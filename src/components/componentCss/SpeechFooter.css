@@ -17,6 +17,10 @@
     border-radius: 20px;
 }
 
+.speech-footer * {
+    transition: 0.3s ease;
+}
+
 .speech-footer .response{
     height: 50vh;
     width: 100%;
@@ -32,7 +36,7 @@
 }
 
 .speech-footer .response p{
-    color: #e7e7e7;
+    /* color: #e7e7e7; */
     font-weight: bold;
     font-size: 3rem;
     margin: 20px;

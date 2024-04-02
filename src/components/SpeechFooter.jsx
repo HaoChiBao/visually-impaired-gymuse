@@ -14,7 +14,16 @@ const SpeechFooter = ({speech, response, speechColour, responseColour}) => {
             speechElement.style.color = '#FF5353'
         }
 
-        responseElement.style.backgroundColor = responseColour
+        if(responseColour == 0){
+            responseElement.style.backgroundColor = '#18181899'
+            responseElement.style.color = '#fff'
+        } else if (responseColour == 1){
+            responseElement.style.backgroundColor = '#90FF5B99'
+            responseElement.style.color = '#000'
+        } else {
+            responseElement.style.backgroundColor = '#ffd00099'
+            responseElement.style.color = '#000'
+        }
 
         console.log('speechColour', speechColour)
         console.log('responseColour', responseColour)
