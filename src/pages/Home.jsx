@@ -28,7 +28,9 @@ const retryPhrase = `I didn\'t catch that. Remember to say "${keyword.toUpperCas
 
 const defaultResponsePhrase = 'press to talk...'
 // const defaultResponsePhrase = 'Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-const defaultTranscriptPhrase = 'user voice here'
+const defaultTranscriptPhrase = 'user voice here...'
+
+let transcriptTimeout = null
 
 const Home = () => {
   const [transcript, setTranscript] = useState(defaultTranscriptPhrase); // stores the text generated from STT
@@ -48,6 +50,8 @@ const Home = () => {
       // onFinalTranscript(finalTranscript);
       setTranscript(finalTranscript);
       resetTranscript();
+
+      transcriptTimeout = setTimeout(() => {setTranscript(defaultTranscriptPhrase)}, 1000)
     }
   }, [finalTranscript, resetTranscript]);
 
@@ -55,6 +59,7 @@ const Home = () => {
     if(interimTranscript != ''){
       setTranscript(interimTranscript)
       pulseSpeakerBubble()
+      clearTimeout(transcriptTimeout)
     }
   },[interimTranscript])
 
