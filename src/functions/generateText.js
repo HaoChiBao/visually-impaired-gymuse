@@ -8,6 +8,8 @@ const generateText = async (audioBlob) => {
     const formData = new FormData();
     formData.append('model', model);
     formData.append('file', audioBlob);
+    // define language type ENGLISH
+    formData.append('language', 'en'); // Set language to English
 
     try {
         const response = await axios.post(apiUrl, formData, {
