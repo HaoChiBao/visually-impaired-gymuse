@@ -154,7 +154,7 @@ const Login = () => {
     
         if(response) {
             loginDone = true
-            const text = `I've created your account, your username is: ${(userDetails.name).toUpperCase()}-${userDetails.id}. It's your name with a number at the end. I will take you to the home page now`
+            const text = `Welcome back ${userDetails.name}! You have successfully logged in. Redirecting you to the home page...`
             setBotResponse(text)
         } else {
             const text = `I'm sorry, I couldn't log into your account. Double check your credentials`
