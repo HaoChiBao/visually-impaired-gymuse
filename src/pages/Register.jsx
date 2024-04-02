@@ -21,7 +21,7 @@ const audio = new Audio()
 // system.signOut()
 const pageText = [
     // introduction
-    'This is the register page. Say "NEXT" to continue ',
+    'This is the register page. Say "NEXT" to continue. To login say "LOGIN", to go home say "HOME"',
     'I will ask you a few personal questions to get to know you better. I will repeat your answers back to you, all you have to do to confirm is say yes or no',
     'You will also be able to edit your responses directly on the screen',
     'If I go too fast you can click the top half of the screen to hear the information again or say "BACK" to go to the previous page',
@@ -57,6 +57,9 @@ const triggerWords = [
 
     'yes', // confirm the information
     'no', // deny the information
+
+    'login', // go to login page
+    'home', // go to home page
 
     'complete password', // indicates that the user is done speaking their password sentence
 ]
@@ -257,6 +260,14 @@ const Register = () => {
                         //     break
                         case 'back':
                             previousPage()
+                            break
+
+                        case 'login':
+                            window.location.pathname = '/login'
+                            break
+
+                        case 'home':
+                            window.location.pathname = '/'
                             break
 
                         case 'my name is':

@@ -52,6 +52,9 @@ const triggerWords = [
     'yes', // confirm the information
     'no', // deny the information
 
+    'home', // go to home page
+    'register', // go to register page
+
     'complete password', // indicates that the user is done speaking their password sentence
 ]
 
@@ -236,6 +239,14 @@ const Login = () => {
                         //     break
                         case 'back':
                             previousPage()
+                            break
+
+                        case 'register':
+                            window.location.pathname = '/register'
+                            break
+
+                        case 'home':
+                            window.location.pathname = '/'
                             break
 
                         case 'my name is':
