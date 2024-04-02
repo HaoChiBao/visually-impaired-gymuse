@@ -31,7 +31,8 @@ const Test = () => {
   const handleRecordComplete = async (blob) => {
     addAudioElement(blob);
     const text = await generateText(blob);
-    setTranscript(text);
+    document.querySelector('.transcript').innerHTML = text;
+    // setTranscript(text);
   }
 
   return (
@@ -55,7 +56,8 @@ const Test = () => {
         <button onClick={stopRecording} disabled={!isRecording}>
           Stop Recording
         </button>
-        <p>{transcript}</p>
+        <p className="transcript">...</p>
+        {/* <p>{transcript}</p> */}
       </div>
     </section>
   );

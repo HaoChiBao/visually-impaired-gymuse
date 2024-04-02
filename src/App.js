@@ -3,7 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 
 import Test from './pages/Test';
-import TestCopy from './pages/old/TestCopy';
+// import TestCopy from './pages/old/TestCopy';
 
 import { Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
