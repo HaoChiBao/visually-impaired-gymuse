@@ -82,14 +82,16 @@ class System {
 
     async signIn(email, password){
         try{
+            if(this.user) await this.signOut();
             const response = await signInWithEmailAndPassword(this.auth, email, password)
             console.log(response)
-            
+            return true;
         } catch(error){
             let errorCode = error.code;
             let errorMessage = error.message;
         
             console.log(errorCode, errorMessage);
+            return false;
         }
 
     }
