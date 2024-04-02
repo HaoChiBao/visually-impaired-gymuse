@@ -223,7 +223,6 @@ const Register = () => {
         const source = await generateSpeech(text)
         setResponseAudio(source)
         const response = await playAudio(source)
-        console.log('response', response)
         if(response) {setResponseColour(0)}  
         setIsSpeaking(false)
         await stopListening()
@@ -372,7 +371,7 @@ const Register = () => {
     
           } catch (err){
             console.log(err)
-            resolve(err)
+            resolve(false)
           }
         })
       }

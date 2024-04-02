@@ -186,7 +186,7 @@ const Home = () => {
         test.style.color = 'red'
         test.innerHTML = err
         setTimeout(()=>{test.style.color = 'black'},1000)
-        resolve(err)
+        resolve(false)
 
       }
     })
