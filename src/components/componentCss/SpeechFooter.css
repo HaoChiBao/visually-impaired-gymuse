@@ -20,6 +20,7 @@
 .speech-footer .response{
     height: 50vh;
     width: 100%;
+    /* background-color: #18181899; */
     background-color: #18181899;
     
     display: flex;
@@ -31,7 +32,7 @@
 }
 
 .speech-footer .response p{
-    color:#ffd000;
+    color: #e7e7e7;
     font-weight: bold;
     font-size: 3rem;
     margin: 20px;
@@ -48,6 +49,7 @@
 }
 
 .speech-footer .speech p{
+    /* color:#ffd000; */
     color: #e7e7e7;
     font-weight: normal;
     font-size: 1.2rem;

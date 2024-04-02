@@ -42,6 +42,9 @@ const Home = () => {
 
   const [responseAudio, setResponseAudio] = useState(null)
 
+  const [speechColour, setSpeechColour] = useState(0)
+  const [responseColour, setResponseColour] = useState(0)
+
   const [test, setTest] = useState('test')
   // executes when the final result occurs
   useEffect(() => {
@@ -73,14 +76,17 @@ const Home = () => {
     // console.log('Final result:', transcript);
     // console.log(isSpeaking)
     if((transcript.toLowerCase()).includes(keyword) && !isSpeaking){
+      setSpeechColour(1) // indicates to user that the response is being processed
+
       chatHistory.push({role: 'user', content: transcript + contentAdd})
       const [response, copyChatHistory] = await generateResponse(chatHistory)
       chatHistory = copyChatHistory
       console.log(chatHistory)
       console.log(response)
       setBotResponse(response)
+      setSpeechColour(0) // indicates to user that the response was processed
     } else {
-
+      setSpeechColour(2) // indicates to user that the response was not processed
     }
   };
 
@@ -100,14 +106,16 @@ const Home = () => {
   
   // toggles between speech recognition
   const toggleListening = async () => {
-    console.log(0)
     // if(isSpeaking) return
     pulseSpeakerBubble()
     if(listening){
+      clearTimeout(transcriptTimeout)
       onFinalTranscript(transcript)
       await stopListening()
+    }else {
+      setSpeechColour(0)
+      await startListening()
     }
-    else await startListening()
   }
 
   const requestAudioPermission = async () => {
@@ -186,7 +194,11 @@ const Home = () => {
 
       <button className = 'top' onClick ={handleTopClick}>
         {/* <p>{botResponse}</p> */}
-        <SpeechFooter speech = {transcript} response = {botResponse}/>
+        <SpeechFooter 
+          speech = {transcript} 
+          response = {botResponse} 
+          speechColour={speechColour} 
+          responseColour={responseColour}/>
       </button>
 
       {/* <div className="test">{test}</div> */}
