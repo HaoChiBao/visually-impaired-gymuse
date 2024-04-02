@@ -1,5 +1,6 @@
 import './css/Register.css';
 import { useState, useEffect } from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 // components
 import {SpeakerBubble, changeSpeakerBubble, pulseSpeakerBubble} from '../components/SpeakerBubble';
@@ -11,11 +12,11 @@ import generateSpeech from '../functions/generateSpeech';
 import getNumberFromString from '../functions/getNumberFromString';
 
 // sounds
-import recognitionOnSound from '../audio/bellchime.mp3'
-// import recognitionOffSound from '../audio/belloff.mp3'
-import recognitionOffSound from '../audio/popup.mp3'
+import onSound from '../audio/recognitionOn.mp3'
+import offSound from '../audio/recognitionOff.mp3'
 
 const system = new System()
+const audio = new Audio()
 
 // system.signOut()
 const pageText = [
@@ -23,7 +24,7 @@ const pageText = [
     'This is the register page. Say "NEXT" to continue ',
     'I will ask you a few personal questions to get to know you better. I will repeat your answers back to you, all you have to do to confirm is say yes or no',
     'You will also be able to edit your responses directly on the screen',
-    'If I go too fast you can say "REPEAT" to hear the information again or say "BACK" to go to the previous page',
+    'If I go too fast you can click the top half of the screen to hear the information again or say "BACK" to go to the previous page',
     'Ready to begin?',
 
     // user information
@@ -46,7 +47,7 @@ let pageCounter = 0
 
 const triggerWords = [
     'next', // next page of information
-    'repeat', // repeat page of information
+    // 'repeat', // repeat page of information
     'back', // go back to step page
 
     'my name is',
@@ -91,53 +92,60 @@ let speechOn = false
 
 let isSpeaking = false
 
+const defaultResponsePhrase = 'press to talk...'
+// const defaultResponsePhrase = 'Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+const defaultTranscriptPhrase = 'user voice here...'
+
 const Register = () => {
-
-    const [speech, setSpeech] = useState(pageText[0])
-    const [transcript, setTranscript] = useState('what you say appears here...')
-    const [userInput, setUserInput] = useState('')
-
-    let recognition = new window.webkitSpeechRecognition;
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
-    const turnRecognitionOn = async () => {
-        speechOn = true
-        try {
-            changeSpeakerBubble(false, true)
-            pulseSpeakerBubble()
-            recognition.start() 
-        } catch (error) {
-            console.error(error)
-        }
-    }
     
-    const turnRecognitionOff = async () => {
-        speechOn = false
-        try {
-            pulseSpeakerBubble()
-            recognition.stop()
-            changeSpeakerBubble(false, false)
-            // await recognition.abort()// do not use await here because it will block the rest of the code
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    const [transcript, setTranscript] = useState(defaultTranscriptPhrase); // stores the text generated from STT
+    const [botResponse, setBotResponse] = useState(pageText[0])
+    const [speakerState, setSpeakerState] = useState(0); // determines the state of the speaker bubble 
 
-    const toggleRecognition = () => {
-        const audio = new Audio()
-        if(speechOn) {
-            turnRecognitionOff()
-            audio.src = recognitionOffSound
-        } else {
-            turnRecognitionOn()
-            audio.src = recognitionOnSound
+    const [isSpeaking, setIsSpeaking] = useState(false)
+    const [resetUserString, setResetUserString] = useState(false)
+    const { finalTranscript, interimTranscript, resetTranscript, listening } = useSpeechRecognition();
+
+    const [responseAudio, setResponseAudio] = useState(null)
+
+    const [speechColour, setSpeechColour] = useState(0)
+    const [responseColour, setResponseColour] = useState(0)
+
+    const [contrast, setContrast] = useState(1)
+
+    const [test, setTest] = useState('test')
+    // executes when the final result occurs
+    useEffect(() => {
+        if (finalTranscript !== '') {
+        console.log('Final result:', finalTranscript)
+        // onFinalTranscript(finalTranscript);
+        setTranscript(finalTranscript);
+        resetTranscript();
+        setResetUserString(true)
         }
-        audio.play()
-    }
+    }, [finalTranscript, resetTranscript]);
+
+    useEffect(()=>{
+        if(interimTranscript != ''){
+        if(resetUserString){
+            setTranscript('')
+            setResetUserString(false)
+        }
+
+        setTranscript(interimTranscript)
+        pulseSpeakerBubble()
+        }
+    },[interimTranscript])
+
+    useEffect(() => {
+        if(botResponse != defaultResponsePhrase){
+        setResponseColour(1)
+        speak(botResponse)
+        }
+    },[botResponse])
 
     const generateUser = async () => {
+        console.log(userDetails)
         console.log('Generating user...')
         if(userDetails.name == '' || userDetails.age == -1 || userDetails.weight == -1 || userDetails.password == '' || userDetails.height == -1) {
             console.error('User details are not complete')
@@ -155,7 +163,7 @@ const Register = () => {
         userDetails.email = email
         const password = userDetails.password
         // console.log(id)
-        
+        // return
         const response = await system.register(email, password, username)
     
         if(response) {
@@ -167,35 +175,22 @@ const Register = () => {
             await system.setData(system.userRef, system.data)
         }
     }
-    
-    const openUserInput = (value = '') => {
-        const input = document.querySelector('input')
-        input.style.opacity = 1
-        input.style.pointerEvents = 'all'
-        input.value = value
-    }
-
-    const closeUserInput = () => {
-        const input = document.querySelector('input')
-        input.style.opacity = 0
-        input.style.pointerEvents = 'none'
-        input.value = ''
-    }
 
     const goToPage = (num) => {
+        console.log(userDetails)
         pageCounter = num
 
         if (pageText[pageCounter].includes('Is your')){
-            setSpeech(pageText[pageCounter] + ' ' + userDetails[pageText[pageCounter].split(' ')[2]])
-            openUserInput(userDetails[pageText[pageCounter].split(' ')[2]])
+            setBotResponse(pageText[pageCounter] + ' ' + userDetails[pageText[pageCounter].split(' ')[2]])
+            // openUserInput(userDetails[pageText[pageCounter].split(' ')[2]])
         } 
         else if (pageCounter == 16){
-            setSpeech(userDetails.password + ' ' + pageText[pageCounter])
-            openUserInput(userDetails.password)
+            setBotResponse(userDetails.password + ' ' + pageText[pageCounter])
+            // openUserInput(userDetails.password)
         } 
         else {
-            setSpeech(pageText[pageCounter])
-            closeUserInput()
+            setBotResponse(pageText[pageCounter])
+            // closeUserInput()
         }
 
     }
@@ -208,8 +203,8 @@ const Register = () => {
             await generateUser()
             registerDone = true
             const text = `I've created your account, your username is: ${(userDetails.name).toUpperCase()}-${userDetails.id}. It's your name with a number at the end. I will take you to the home page now`
-            setSpeech(text)
-            closeUserInput()
+            setBotResponse(text)
+            // closeUserInput()
         }
     }
 
@@ -219,76 +214,18 @@ const Register = () => {
             goToPage(pageCounter)
         }
     }
-
-    const handleInput = (e) => {
-        let value = e.target.value
-        if(e.key != 'Enter' && e.key != 'Backspace') value += e.key
-        
-        console.log(pageCounter)
-        if(pageCounter == 6){
-            // name
-            userDetails.name = value
-            clearTimeout(inputTimer)
-            inputTimer = setTimeout(() => {
-                setSpeech(`Is your name ${value}?`)
-            },500)
-        } else if (pageCounter == 8) {
-            clearTimeout(inputTimer)
-            inputTimer = setTimeout(() => {
-                setSpeech(`Is your weight ${value}?`)
-            },500)
-            // weight
-            userDetails.weight = value
-        } else if (pageCounter == 10){
-            clearTimeout(inputTimer)
-            inputTimer = setTimeout(() => {
-                setSpeech(`Is your age ${value}?`)
-            },500)
-            //age
-            userDetails.age = value
-        
-        } else if (pageCounter == 12) {
-            clearTimeout(inputTimer)
-            inputTimer = setTimeout(() => {
-                setSpeech(`Is your height ${value}?`)
-            },500)
-            //height
-            userDetails.height = value
-        } else if (pageCounter == 16){
-            clearTimeout(inputTimer)
-            inputTimer = setTimeout(() => {
-                setSpeech(`${value} ${pageText[pageCounter]}`)
-            },500)
-            //password
-            userDetails.password = value
-        }
-    }
-
-    const handleClick = (e) => {
-        if(isSpeaking) return
-        toggleRecognition()
-    }
     
-    const speak = async () => {
-        if(isSpeaking) {console.error('NOTE: something is already being said') ; return}
-        console.log(pageCounter)
-        console.log (userDetails)
-        // functions that run before the speech
-        isSpeaking = true
-        
-        const timer = setTimeout(() => {console.log('Speech took too long...')}, 10000)
-        
-        turnRecognitionOff()
-        changeSpeakerBubble(true)
-        
-        const response = await generateSpeech(speech)
-        
-        if(!response){turnRecognitionOff(); return}
-
-        turnRecognitionOn()
-        isSpeaking = false
-
-        clearTimeout(timer)
+    const speak = async (text) => {
+        if(text == defaultResponsePhrase) return
+        setIsSpeaking(true)
+        await stopListening()
+        setSpeakerState(2)
+        const source = await generateSpeech(text)
+        setResponseAudio(source)
+        const response = await playAudio(source)
+        if(response) {setResponseColour(0)}  
+        setIsSpeaking(false)
+        await stopListening()
 
         // automatically complete this page
         if (pageCounter == 13 || pageCounter == 14){
@@ -296,130 +233,163 @@ const Register = () => {
         } 
         if (registerDone){
             console.log('redirecting to home page')
-            // window.location.pathname = '/'
+            window.location.pathname = '/'
         }
-        
-        // if the user is inactive for 1 minute, remind them that the system is still listening
-        clearTimeout(reminder)
-        reminder = setTimeout(async () => {
-            isSpeaking = true
-            changeSpeakerBubble()
-            turnRecognitionOff()
-            await generateSpeech('Hey are you still there? Say "NEXT" to continue or "REPEAT" to hear the information again or say "BACK" to go to the previous page')
-            turnRecognitionOn()
-            changeSpeakerBubble(false)
-            isSpeaking = false
-        }, 60000)
     }
 
-    recognition.onresult = (event) => {
-        if(!isSpeaking) {
-            changeSpeakerBubble(false, true)
+    const onFinalTranscript = async (transcript) => {
+        // console.log('Final result:', transcript);
+        // console.log(isSpeaking)
+        if(!isSpeaking){
+            let found = false
+            triggerWords.forEach(async (word) => {
+                
+                if ((transcript.toLowerCase()).includes(word)) {
+                    setResponseColour(2)
+                    found = true
+                    // turnRecognitionOff()
+                    switch (word) {
+                        case 'next':
+                            nextPage()
+                            break
+                        // case 'repeat':
+                        //     await repeat()
+                        //     break
+                        case 'back':
+                            previousPage()
+                            break
 
-            // get the transcript
-            const last = event.results.length - 1
-            let speech = event.results[last][0].transcript
-            speech = speech.toLowerCase()
+                        case 'my name is':
+                            const name = transcript.split('my name is')[1].trim()
+                            userDetails.name = name
+                            goToPage(6)
+                            break
+                        case 'my weight is':
+                            const weight = getNumberFromString(transcript)[0]
+                            userDetails.weight = weight
+                            goToPage(8)
+                            break
+                        case 'my age is':
+                            const age = getNumberFromString(transcript)[0]
+                            userDetails.age = age
+                            goToPage(10)
+                            break
 
-            setTranscript(speech)
-            pulseSpeakerBubble()
+                        case 'my height is':
+                            const height = getNumberFromString(transcript)[0]
+                            userDetails.height = height
+                            goToPage(12)
+                            break
 
-            clearTimeout(timeout)
-            timeout = setTimeout(() => {
-                triggerWords.forEach(async (word) => {
-                    if (speech.includes(word)) {
-                        // turnRecognitionOff()
-                        switch (word) {
-                            case 'next':
+                        case 'yes':
+                            console.log(pageCounter)
+                            if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 12 || pageCounter == 16){
                                 nextPage()
-                                break
-                            case 'repeat':
-                                await speak()
-                                break
-                            case 'back':
+                            }
+                            break;
+                            
+                        case 'no':
+                            if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 12 || pageCounter == 16){
                                 previousPage()
-                                break
+                            }
+                            break
 
-                            case 'my name is':
-                                const name = speech.split('my name is')[1].trim()
-                                userDetails.name = name
-                                goToPage(6)
-                                break
-                            case 'my weight is':
-                                const weight = getNumberFromString(speech)[0]
-                                userDetails.weight = weight
-                                goToPage(8)
-                                break
-                            case 'my age is':
-                                const age = getNumberFromString(speech)[0]
-                                userDetails.age = age
-                                goToPage(10)
-                                break
+                        case 'complete password':
+                            userDetails.password = transcript.split('complete password')[0].trim()
+                            goToPage(16)
+                            break
 
-                            case 'my height is':
-                                const height = getNumberFromString(speech)[0]
-                                userDetails.height = height
-                                goToPage(12)
-                                break
-
-                            case 'yes':
-                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 12 || pageCounter == 16){
-                                    nextPage()
-                                }
-                                break;
-                                
-                            case 'no':
-                                if(pageCounter == 4 || pageCounter == 6 || pageCounter == 8 || pageCounter == 10 || pageCounter == 12 || pageCounter == 16){
-                                    previousPage()
-                                }
-                                break
-
-                            case 'complete password':
-                                userDetails.password = speech.split('complete password')[0].trim()
-                                goToPage(16)
-                                break
-
-                            default:
-                                break
-                        }
+                        default:
+                            break
                     }
-                })
-            }, 450)
-        }
+                }
+            })
+            if(found) setSpeechColour(1) // indicates to user that the response is being processed
+            else setSpeechColour(2) // indicates to user that the response was not processed
+        } 
+      };
+
+    const repeat = async () => {
+        await speak(botResponse)
     }
 
-    recognition.onstart = () => {
-        console.log('Speech recognition starting...')
-        changeSpeakerBubble(false, true)
-        speechOn = true
+    const handleTopClick = async (e) =>{
+        e.stopPropagation()
+        setResponseColour(0)
+        await playAudio(responseAudio)
     }
 
-    recognition.onend = () => {
-        console.log('Speech recognition ending...')
-        changeSpeakerBubble(false, false)
-        speechOn = false
+    const toggleContrast = () => {
+        const TOGGLE_AMOUNT = 5
+        
+        const r = document.querySelector(':root')
+        const percent = 100 + (contrast % TOGGLE_AMOUNT) * 15
+        console.log(percent)
+        r.style.setProperty('--contrast', `${percent}%`)
+        setContrast(contrast + 1)
     }
+
+      // start speech recognition
+    const startListening = async () => {
+        setSpeakerState(1)
+        playAudio(onSound)
+        if(!listening) await SpeechRecognition.startListening({ continuous: true });
+    };
     
-    useEffect(() => {
-        speak()
-        
-        if(speechOn) {
-            turnRecognitionOn()
+    // stop speech recognition
+    const stopListening = async () => {
+        setSpeakerState(0)
+        playAudio(offSound)
+        if(listening) await SpeechRecognition.stopListening();
+    };
+    
+    // toggles between speech recognition
+    const toggleListening = async (e) => {
+        e.stopPropagation()
+
+        // if(isSpeaking) return
+        pulseSpeakerBubble()
+        if(listening){
+        onFinalTranscript(transcript)
+        await stopListening()
+        }else {
+        setSpeechColour(0)
+        await startListening()
         }
-        
-    }, [speech])
+    }
+
+    const playAudio = async (source) => {
+        audio.src = source
+        return new Promise(async (resolve, reject)=>{
+          try{
+            audio.pause()
+            await audio.play();
+    
+            audio.onended = () => {
+              resolve(true)
+            }
+    
+          } catch (err){
+            console.log(err)
+            resolve(err)
+          }
+        })
+      }
 
     return (
-        <div className="Register">
-            <div className="top" onClick={handleClick}>
-                <SpeakerBubble/>
+        <section id="Register" onClick={toggleContrast}>
+            <div className="top" onClick={handleTopClick}>
+                <SpeechFooter 
+                    speech={transcript}
+                    response={botResponse}
+                    speechColour={speechColour}
+                    responseColour={responseColour}/>
             </div>
             <div className="bottom">
-                <p>{speech}</p>
-                <input type="text" placeholder='details...' onKeyDown={handleInput}/>
+                <SpeakerBubble state = {speakerState} clickEvent={toggleListening}/>
             </div>
-            <SpeechFooter speech={transcript}/>
-        </div>
+        </section>
+        
     )
 }
 

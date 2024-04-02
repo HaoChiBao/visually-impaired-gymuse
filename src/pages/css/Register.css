@@ -1,69 +1,45 @@
-.Register{
+#Register{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  
     height: 100vh;
-    background-color: #303030;
-
     width: 100vw;
-
+  
+    background-color: #303030;
+    /* color: #fff; */
+    /* background-color: #262626; */
+  
     overflow: hidden;
-}
+  
+    position: relative;
+  }
 
-.Register .top {
+#Register .top {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     
     width: 100%;
-    height: 50%;
+    height: 100%;
+
+    background-color: transparent;
+    outline: none;
+    border: none;
 }
 
-.Register .bottom {
-    /* padding-top: 20px; */
+#Register .bottom {
     display: flex;
     flex-direction: column;
     align-items: center;
     
     width: 100%;
-    height: 50%;
-}
-
-.Register p{
-    font-size: 1.2rem;
-    color: rgb(230, 230, 230);
-    font-weight: bold;
-
-    max-width: 70vw;
-
-    /* color:#ffd000; */
-    background-color: rgb(22, 22, 22);
-    padding: 5px 10px;
-    border-radius: 10px;
-}
-
-.Register input {
-    max-width: 70vw;
-    height: 50px;
-    margin: 10px 0;
-    
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    background-color: #000000;
-    
-    color:#ffd000;
-    font-weight: bold;
-    font-size: 3rem;
-    text-align: center;
-
-    opacity: 0;
-    pointer-events: none;
-}
-
-.Register input:focus {
+    /* height: 50%; */
+    background-color: transparent;
     outline: none;
-    border: 2px solid #ffd000;
+    border: none;
+
+    margin: 40px;
 }

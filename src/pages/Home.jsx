@@ -7,6 +7,8 @@ import { SpeakerBubble, changeSpeakerBubble, pulseSpeakerBubble } from '../compo
 import generateResponse from '../functions/generateResponse';
 import generateSpeech from '../functions/generateSpeech';
 
+import System from '../auth/system'
+
 import onSound from '../audio/recognitionOn.mp3'
 import offSound from '../audio/recognitionOff.mp3'
 
@@ -30,7 +32,9 @@ const defaultResponsePhrase = 'press to talk...'
 // const defaultResponsePhrase = 'Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
 const defaultTranscriptPhrase = 'user voice here...'
 
-let transcriptTimeout = null
+let loadUserData = false
+
+const system = new System()
 
 const Home = () => {
   const [transcript, setTranscript] = useState(defaultTranscriptPhrase); // stores the text generated from STT
@@ -69,7 +73,6 @@ const Home = () => {
 
       setTranscript(interimTranscript)
       pulseSpeakerBubble()
-      clearTimeout(transcriptTimeout)
     }
   },[interimTranscript])
 
@@ -88,6 +91,13 @@ const Home = () => {
     if((transcript.toLowerCase()).includes(keyword) && !isSpeaking){
       setSpeechColour(1) // indicates to user that the response is being processed
       setResponseColour(2)
+
+      if(!loadUserData && system.user){
+        const promptUserData = `Here is some user data: \n name: ${system.data.details.name} \n height: ${system.data.details.height} \n age: ${system.data.details.age} \n weight: ${system.data.details.weight} \n BMI: ${system.data.details.BMI}`
+        chatHistory.push({role: 'system', content: promptUserData})
+        console.log(promptUserData)
+        loadUserData = true
+      }
 
       chatHistory.push({role: 'user', content: transcript + contentAdd})
       const [response, copyChatHistory] = await generateResponse(chatHistory)
@@ -122,7 +132,6 @@ const Home = () => {
     // if(isSpeaking) return
     pulseSpeakerBubble()
     if(listening){
-      clearTimeout(transcriptTimeout)
       onFinalTranscript(transcript)
       await stopListening()
     }else {
@@ -184,12 +193,12 @@ const Home = () => {
   }
 
   const speak = async (text) => {
-    if(text == defaultResponsePhrase) return
     // const test2 = document.querySelector('.test2')
     // const audioPermission = await requestAudioPermission()
     // test2.innerHTML = audioPermission
     // console.log(audioPermission)
     
+    if(text == defaultResponsePhrase) return
     setIsSpeaking(true)
     await stopListening()
     setSpeakerState(2)
@@ -197,6 +206,7 @@ const Home = () => {
     setResponseAudio(source)
     const response = await playAudio(source)
     
+    if(response) {setResponseColour(0)}  
     setIsSpeaking(false)
     await stopListening()
     // if(isDown) await startListening()
@@ -226,19 +236,9 @@ const Home = () => {
           responseColour={responseColour}/>
       </button>
 
-      {/* <div className="test">{test}</div> */}
       <div className="test" style={{position:'absolute', bottom: 0, opacity: 0}}>test</div>
-      {/* <div className="test2">test2</div> */}
 
       <div className = 'bottom'>
-      {/* <div className = 'bottom' 
-        onMouseDown={handleDown} 
-        onTouchStart={handleDown}
-
-        onMouseUp={handleUp}
-        onTouchEnd={handleUp}
-      > */}
-        {/* <div>{listening ? <p>T</p> : <p>F</p>}</div> */}
         <SpeakerBubble state = {speakerState} clickEvent = {toggleListening}/>
       </div>
 
