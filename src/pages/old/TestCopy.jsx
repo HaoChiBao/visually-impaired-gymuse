@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-import generateText from '../functions/generateText';
+import generateText from '../../functions/generateText';
 
-function Test() {
+
+
+function TestCopy() {
   const [recording, setRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const mediaRecorder = useRef(null);
@@ -74,4 +76,4 @@ function Test() {
   );
 }
 
-export default Test;
+export default TestCopy;

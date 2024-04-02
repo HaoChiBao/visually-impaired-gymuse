@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AudioRecorder, useAudioRecorder } from 'react-audio-voice-recorder';
-import generateText from '../functions/generateText';
+// import generateText from '../functions/generateText';
 import './css/Test.css';
 const Test = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -27,14 +27,7 @@ const Test = () => {
   };
 
   const handleRecordComplete = (blob) => {
-    // convert blob to base64
-    const reader = new FileReader();
-    reader.readAsDataURL(blob);
-    reader.onloadend = async () => {
-      const base64data = reader.result;
-      const text = await generateText(base64data);
-      setTranscript(text);
-    };
+    console.log(blob)
     addAudioElement(blob);
   }
 
@@ -47,8 +40,6 @@ const Test = () => {
             noiseSuppression: true,
             echoCancellation: true,
           }} 
-          downloadOnSavePress={true}
-          downloadFileExtension="webm"
           record={isRecording}
           recorderControls={recorderControls}
         />
