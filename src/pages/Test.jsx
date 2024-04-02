@@ -1,53 +1,51 @@
-import React, { useState, useRef, useEffect } from 'react';
-
-import generateText from '../functions/generateText';
-import { ReactMic } from 'react-mic';
+import React, { useState } from "react";
+import { AudioRecorder, useAudioRecorder } from 'react-audio-voice-recorder';
 
 const Test = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [blobURL, setBlobURL] = useState('');
+
+  const recorderControls = useAudioRecorder();
+
+  const addAudioElement = (blob) => {
+    const url = URL.createObjectURL(blob);
+    const audio = document.createElement("audio");
+    audio.src = url;
+    audio.controls = true;
+    document.body.appendChild(audio);
+  };
 
   const startRecording = () => {
     setIsRecording(true);
+    recorderControls.startRecording();
   };
 
   const stopRecording = () => {
     setIsRecording(false);
+    recorderControls.stopRecording();
   };
-
-  const onData = recordedBlob => {
-    console.log('chunk of real-time data is: ', recordedBlob);
-  };
-
-  const onStop = recordedBlob => {
-    console.log('recordedBlob is: ', recordedBlob);
-    setBlobURL(recordedBlob.blobURL);
-  };
-  // hellooo000
 
   return (
-    <div>
-      <h1>Audio Recorder</h1>
-      <ReactMic
+    <section>
+      <AudioRecorder 
+        onRecordingComplete={addAudioElement}
+        audioTrackConstraints={{
+          noiseSuppression: true,
+          echoCancellation: true,
+        }} 
+        downloadOnSavePress={true}
+        downloadFileExtension="webm"
         record={isRecording}
-        className="sound-wave"
-        onStop={onStop}
-        onData={onData}
-        mimeType="audio/wav"
+        recorderControls={recorderControls}
       />
-      <button onClick={startRecording} disabled={isRecording}>
-        Start Recording
-      </button>
-      <button onClick={stopRecording} disabled={!isRecording}>
-        Stop Recording
-      </button>
-      {blobURL && (
-        <div>
-          <h2>Recorded Audio:</h2>
-          <audio controls src={blobURL}></audio>
-        </div>
-      )}
-    </div>
+      <div>
+        <button onClick={startRecording} disabled={isRecording}>
+          Start Recording
+        </button>
+        <button onClick={stopRecording} disabled={!isRecording}>
+          Stop Recording
+        </button>
+      </div>
+    </section>
   );
 };
 
