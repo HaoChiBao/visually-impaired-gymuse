@@ -88,7 +88,7 @@ const Home = () => {
   // useEffect(()=>{console.log(listening)},[listening])
   // 
   const onFinalTranscript = async (transcript) => {
-    if(!promptLogin && !system.user){
+    if(!promptLogin && !system.user && false){
       setBotResponse(`Hey! You're not logged in. Would you like to create a personalized account? If so say "GO TO REGISTER". If not ignore this message.`)
       promptLogin = true
       return
