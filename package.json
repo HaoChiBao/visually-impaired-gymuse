@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.10",
     "@google-cloud/speech": "^6.3.0",
     "@google-cloud/text-to-speech": "^5.1.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -10,6 +11,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
+    "ffmpeg.js": "^4.2.9003",
     "firebase": "^10.8.1",
     "path-browserify": "^1.0.1",
     "react": "^18.2.0",
@@ -19,7 +21,8 @@
     "react-scripts": "5.0.1",
     "react-speech-recognition": "^3.10.0",
     "recordrtc": "^5.6.2",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webm-to-wav-converter": "^1.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

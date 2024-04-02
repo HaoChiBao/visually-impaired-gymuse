@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { AudioRecorder, useAudioRecorder } from 'react-audio-voice-recorder';
-// import generateText from '../functions/generateText';
+
+import generateText from '../functions/generateText';
+
 import './css/Test.css';
 const Test = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -26,9 +28,9 @@ const Test = () => {
     recorderControls.stopRecording();
   };
 
-  const handleRecordComplete = (blob) => {
-    console.log(blob)
-    addAudioElement(blob);
+  const handleRecordComplete = async (blob) => {
+    const text = await generateText(blob);
+    setTranscript(text);
   }
 
   return (
@@ -39,7 +41,8 @@ const Test = () => {
           audioTrackConstraints={{
             noiseSuppression: true,
             echoCancellation: true,
-          }} 
+          }}
+          downloadFileExtension="webm" 
           record={isRecording}
           recorderControls={recorderControls}
         />

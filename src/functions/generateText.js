@@ -5,9 +5,14 @@ const apiUrl = `https://api.openai.com/v1/audio/transcriptions`;
 const model = 'whisper-1';
 
 const generateText = async (audioBlob) => {
+    console.log(audioBlob)
+    // save audio blob as a local file
+    const audioFile = new File([audioBlob], 'audio.webm', {type: 'audio/webm'});
+
     const formData = new FormData();
     formData.append('model', model);
-    formData.append('file', audioBlob);
+    // formData.append('file', audioBlob);
+    formData.append('file', audioFile);
     // define language type ENGLISH
     formData.append('language', 'en'); // Set language to English
 
