@@ -44,6 +44,7 @@ const Home = () => {
   // executes when the final result occurs
   useEffect(() => {
     if (finalTranscript !== '') {
+      console.log('Final result:', finalTranscript)
       // onFinalTranscript(finalTranscript);
       setTranscript(finalTranscript);
       resetTranscript();
@@ -90,14 +91,15 @@ const Home = () => {
     setSpeakerState(0)
     playAudio(offSound)
     if(listening) await SpeechRecognition.stopListening();
-    onFinalTranscript(transcript)
   };
   
   // toggles between speech recognition
   const toggleListening = async () => {
+    console.log(0)
     // if(isSpeaking) return
     pulseSpeakerBubble()
     if(listening){
+      onFinalTranscript(transcript)
       await stopListening()
     }
     else await startListening()
