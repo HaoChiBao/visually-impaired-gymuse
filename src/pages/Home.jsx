@@ -56,8 +56,7 @@ const Home = () => {
       // onFinalTranscript(finalTranscript);
       setTranscript(finalTranscript);
       resetTranscript();
-
-      transcriptTimeout = setTimeout(() => {setResetUserString(true)}, 1000)
+      setResetUserString(true)
     }
   }, [finalTranscript, resetTranscript]);
 
@@ -67,7 +66,7 @@ const Home = () => {
         setTranscript('')
         setResetUserString(false)
       }
-      
+
       setTranscript(interimTranscript)
       pulseSpeakerBubble()
       clearTimeout(transcriptTimeout)
@@ -228,7 +227,7 @@ const Home = () => {
       </button>
 
       {/* <div className="test">{test}</div> */}
-      <div className="test">test</div>
+      <div className="test" style={{position:'absolute', bottom: 0, opacity: 0}}>test</div>
       {/* <div className="test2">test2</div> */}
 
       <div className = 'bottom'>
